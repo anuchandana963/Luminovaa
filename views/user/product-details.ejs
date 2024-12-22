@@ -295,10 +295,9 @@
                 <div class="rating">
                     ★★★★☆ <span style="color: #6c757d; font-size: 14px;">(25 reviews)</span>
                 </div>
-                <p><%=product.brand%></p>
                 <p><%=product.description%></p>
                 <div class="price">
-                    <%=product.regularPrice%><span class="old-price"></span>
+                   ₹<%=product.regularPrice%><span class="old-price"></span>
                 </div>
                 <div class="quantity">
                     <button onclick="changeQuantity(-1)">-</button>
@@ -325,7 +324,7 @@
                     </figure>
                     <div class="product-text">
                         <h6><%=recommendedProduct[i].productName%></h6>
-                        <p><%=recommendedProduct[i].salePrice%></p>
+                        <p>₹<%=recommendedProduct[i].salePrice%></p>
                     </div>
                 </div>
             </div>

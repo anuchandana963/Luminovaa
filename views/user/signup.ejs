@@ -1,12 +1,5 @@
 
 
-
-
-
-
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -198,7 +191,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('signupForm');
 
-            // Get all input fields and error message elements
             const inputs = {
                 name: document.getElementById('name'),
                 phone: document.getElementById('phone'),
@@ -215,19 +207,17 @@
                 cpassword: document.getElementById('cpasswordError')
             };
 
-            // Function to show error
+       
             function showError(inputElement, errorElement) {
                 inputElement.classList.add('input-error');
                 errorElement.style.display = 'block';
             }
 
-            // Function to hide error
             function hideError(inputElement, errorElement) {
                 inputElement.classList.remove('input-error');
                 errorElement.style.display = 'none';
             }
 
-            // Validation functions
             const validations = {
                 name: (value) => value.trim().length >= 3,
                 phone: (value) => /^\d{10}$/.test(value),
@@ -236,7 +226,7 @@
                 cpassword: (value) => value === inputs.password.value
             };
 
-            // Add real-time validation for each input
+
             Object.keys(inputs).forEach(key => {
                 inputs[key].addEventListener('input', function() {
                     const isValid = validations[key](this.value);
@@ -248,13 +238,13 @@
                 });
             });
 
-            // Form submission handler
+
             form.addEventListener('submit', function(event) {
                 event.preventDefault();
                 
                 let isFormValid = true;
 
-                // Validate all fields
+
                 Object.keys(inputs).forEach(key => {
                     const isValid = validations[key](inputs[key].value);
                     if (!isValid) {
@@ -265,13 +255,12 @@
                     }
                 });
 
-                // If form is valid, submit the form
+  
                 if (isFormValid) {
                     this.submit();
                 }
             });
 
-            // Google Sign-In initialization
             window.onload = function () {
                 google.accounts.id.initialize({
                     client_id: "YOUR_GOOGLE_CLIENT_ID", 

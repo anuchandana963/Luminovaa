@@ -24,7 +24,7 @@
             .thumbnail {
                 display: inline-block;
                 margin: 5px;
-                position: relative; /* Needed for remove icon positioning */
+                position: relative; 
             }
 
             .thumbnail img {
@@ -46,7 +46,7 @@
                 padding: 2px 6px;
                 line-height: 14px;
                 text-align: center;
-                z-index: 1; /* Ensures it appears on top */
+                z-index: 1; 
             }
 
             
@@ -250,14 +250,6 @@
         <script>
 
 
-            // function validateAndSubmit() {
-            //     if (validateForm()) {
-            //         document.forms[0].submit();
-            //     }
-            // }
-
-
-
 
             function validateForm() {
                 let imageDatas = false
@@ -405,7 +397,6 @@
                     const file = files[i];
                     selectedImages.push(file);
 
-                    // Create thumbnail
                     const thumbnail = document.createElement("div");
                     thumbnail.classList.add("thumbnail");
 
@@ -415,7 +406,6 @@
                     img.style.width = "50px";
                     img.style.height = "auto";
 
-                    // Create remove icon
                     const removeIcon = document.createElement("span");
                     removeIcon.classList.add("remove-icon");
                     removeIcon.innerHTML = "&times;";
@@ -424,7 +414,7 @@
                         if (index !== -1) {
                             selectedImages.splice(index, 1);
                         }
-                        thumbnail.remove(); // Remove the thumbnail from the DOM
+                        thumbnail.remove();
                     });
 
                     thumbnail.appendChild(img);

@@ -36,7 +36,6 @@ const loadHomepage=async(req,res)=>{
         
         
         
-        
         const category=await Category.find({isListed:true})
         let productData=await Product.find({
             isBlocked:false,
@@ -47,10 +46,7 @@ const loadHomepage=async(req,res)=>{
         // }
 
         productData.sort((a,b)=>new Date(a.createdOn)-new Date(b.createOn)).reverse()
-        
-
-
-
+  
 
         if(userId){
             const userData=await User.findOne({ _id:userId })
@@ -185,7 +181,6 @@ const resendOtp = async (req, res) => {
             });
         }
 
-      
         const otp = generateOtp();
         console.log("Resend OTP:", otp);
         
