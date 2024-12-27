@@ -6,6 +6,7 @@ const env=require('dotenv').config()
 const nodemailer =require('nodemailer');
 const bcrypt=require('bcrypt');
 const { render } = require("ejs");
+const { search } = require("../../routes/userRouter");
 
 const loadSignup=async(req,res)=>{
     try {
@@ -33,23 +34,30 @@ const loadHomepage=async(req,res)=>{
     try{
         // const user = req.user;
         const userId=req.session.user
+        console.log("user Id",userId);
+        
         
         
         
         const category=await Category.find({isListed:true})
+        console.log(category)
         let productData=await Product.find({
             isBlocked:false,
             category:{$in:category.map(category=>category._id)},quantity:{$gt:0}
-        })
+        }).sort({createdAt : -1})
+        console.log("pd",productData);
+        
         // if (req.isAuthenticated()) {
         //     return res.render("home",{user:userId,productData})
         // }
 
-        productData.sort((a,b)=>new Date(a.createdOn)-new Date(b.createOn)).reverse()
+        // productData.sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).reverse()
   
 
         if(userId){
             const userData=await User.findOne({ _id:userId })
+            console.log(userData);
+            
             res.render("home",{user:userData,productData})
         }else{
             return res.render("home",{productData})
@@ -217,11 +225,17 @@ const resendOtp = async (req, res) => {
 
 const loadLogin=async(req,res)=>{
     try {
-        if(!req.session.user){
-            return res.render('login')
-    }else{
-        res.redirect('/')
-    }
+        if (req.session.user) {
+            const user = await User.findById(req.session.user);
+            if (user && user.isBlocked) {
+              req.session.user = null;
+              return res.render("login", { message: "User is blocked" });
+            }
+            return res.redirect("/");
+          } else {
+            return res.render("login", { message: '' });
+          }
+
 
     } catch (error) {
         res.redirect('/pageNotFound')
@@ -265,19 +279,112 @@ const login=async(req,res)=>{
 
 const logout=async(req,res)=>{
     try {
-        req.session.destroy((err)=>{
-            if(err){
-                console.log("session destroy error",err.message)
-                return res.redirect("/pagenotFound")
-            }
-            return res.redirect("/login")
-        })
+        req.session.user = null;
+        res.redirect('/login')
     } catch (error) {
         console.log("logout error",error)
         res.redirect("/pagenotFound")
     }
 }
 
+const loadShoppingPage=async(req,res)=>{
+    try {
+        const user =req.session.user;
+        const userData=await User.findOne({_id:user});
+        const categorise=await Category.find({isListed:true})
+        const categoryId=categorise.map((category)=>category._id.toString())
+        const page=parseInt(req.query.page)||1
+        const limit=8;
+        const skip=(page-1)*limit
+        const product=await Product.find({
+            isBlocked:false,
+            category:{$in:categoryId},
+            quantity:{$gt:0},
+        }).sort({createOn:-1}).skip(skip).limit(limit);
+
+        const totalProducts=await Product.countDocuments({
+            isBlocked:false,
+            category:{$in:categoryId},
+            quantity:{$gt:0}
+        }) 
+const totalPages=Math.ceil(totalProducts/limit)
+
+
+const categoriseWithIds=categorise.map(category=>({_id:category._id,name:category.name}))
+
+
+        return res.render("shop",{
+            user:userData,
+            products:product,
+            category:categoriseWithIds,
+            totalProducts:totalProducts,
+            currentPage:page,
+            totalPages:totalPages
+        })
+    } catch (error) {
+        res.redirect("/pageNotFound")
+    }
+}
+
+
+const filterProduct=async(req,res)=>{
+    try {
+        const user=req.session.user;
+        const category=req.query.category;
+        const findCategory=category?await Category.findOne({_id:category}):null;
+        const query={
+            isBlocked:false,
+            quantity:{$gt:0}
+        }
+if(findCategory){
+    query.category=findCategory._id;
+}
+
+let findProducts=await Product.find(query).lean();
+findProducts.sort((a,b)=>new Date(b.createdOn)-new Date(a.createOn));
+
+const categorise=await Category.find({isListed:true})
+
+let  itemsPerPage=6;
+let currentPage=parseInt(req.query.page)||1;
+let startIndex=(currentPage-1)*itemsPerPage;
+let endIndex=startIndex+itemsPerPage;
+let totalPages=Math.ceil(findProducts.length/itemsPerPage)
+let currentProduct=findProducts.slice(startIndex,endIndex)
+let userData=null;
+if(user){
+    userData=await User.findOne({_id:user});
+     if(userData){
+        const searchEntry={
+            category:findCategory?findCategory._id:null,
+            searchedOn:new DragEvent(),
+
+        }
+        userData.searchHistory.push(searchEntry);
+        await userData.save();
+    }
+}
+
+req.session.filterProduct=currentProduct;
+
+res.render("shop",{
+    user:userDate,
+    products:currentProduct,
+    category:categorise,
+    totalPages,
+    currentPage,
+    SelectedCategory:category||null,
+
+})
+
+
+    } catch (error) {
+        
+        res.redirect("/pageNotFound")
+
+
+    }
+}
 
 
 
@@ -292,5 +399,8 @@ module.exports ={
     resendOtp,
     loadLogin,
     login,   
-    logout   
+    logout,
+    loadShoppingPage,  
+ filterProduct, 
+
 }
