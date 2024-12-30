@@ -6,7 +6,7 @@
     <meta name="keywords" content="Male_Fashion, unica, creative, html" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Male-Fashion</title>
+    <title>Luminova</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css" />
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css" />
@@ -119,12 +119,12 @@
             <div class="heading_s1">
                 <h3>Email Verification Page</h3>
             </div>
-            <form id="otpForm" action="/verify-otp" method="post" onsubmit="return validateOTPForm()">
+            <form id="otpForm">
                 <div class="form-group">
                     <label for="otp">Enter OTP:</label>
                     <input type="text" id="otp" name="otp" class="form-control" required maxlength="6" pattern="\d*" />
                 </div>
-                <button type="submit" class="btn btn-primary">Verify Email</button>
+                <button type="button" id="verify-btn" class="btn btn-primary" onclick="validateOTPForm()">Verify Email</button>
                 <div class="form-group text-center">
                     <div id="otpTimer" class="otp-timer">
                         <span id="timerValue">60</span>
@@ -149,9 +149,21 @@
     let timer = 60;
     let timerInterval;
     const resendBtn = document.getElementById("resendOtp");
+    const verifyBtn = document.getElementById("verify-btn");
+    const otpInput = document.getElementById("otp");
 
+    resendBtn.disabled = true;
+    resendBtn.classList.add('disabled');
 
     function startTimer() {
+        clearInterval(timerInterval);
+        timer = 60;
+        resendBtn.disabled = true;
+        resendBtn.classList.add('disabled');
+        verifyBtn.disabled = false;
+        verifyBtn.classList.remove('disabled');
+        otpInput.disabled = false;
+
         timerInterval = setInterval(() => {
             timer--;
             document.getElementById("timerValue").textContent = timer;
@@ -160,13 +172,17 @@
                 document.getElementById("timerValue").classList.add("expired");
                 document.getElementById("timerValue").textContent = "Expired";
                 document.getElementById("otp").disabled = true;
+                resendBtn.disabled = false;
+                resendBtn.classList.remove('disabled');
+                verifyBtn.disabled = true;
+                verifyBtn.classList.add('disabled');
             }
         }, 1000);
     }
+
     startTimer();
 
-    function validateOTPForm(event) {
-        event.preventDefault(); // Prevent form submission
+    function validateOTPForm() {
 
         const otpInput = document.getElementById("otp").value;
 
@@ -175,7 +191,7 @@
             url: "/verify-otp",
             data: { otp: otpInput },
             success: function (response) {
-                console.log(response); // Debugging the response
+                console.log(response); 
                 if (response.success) {
                     Swal.fire({
                         icon: "success",

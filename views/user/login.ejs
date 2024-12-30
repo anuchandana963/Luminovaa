@@ -7,10 +7,8 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-   
 
     <link rel="shortcut icon" type="image/x-icon" href="assets/imgs/theme/favicon.svg"> 
-    
     <link href="/evara-backend/assets/css/main.css" rel="stylesheet" type="text/css" />
 </head>
 
@@ -22,32 +20,28 @@
                     <img src="assets/imgs/theme/logo.svg" class="logo" alt="Luminova">
                 </a>
             </div>
-            
-                    </li>
-                </ul>
-            </div>
         </header>
+        
         <section class="content-main mt-80 mb-80">
             <div class="card mx-auto card-login">
                 <div class="card-body">
                     <h4 class="card-title mb-4">Login</h4>
-                      
-                    <form method="post" action="/login">
+                
+                    <form method="post" action="/login" id="loginForm">
                         <div class="mb-3">
-                            <input class="form-control" name="email" placeholder="Username or email" type="text">
+                            <input class="form-control" name="email" id="email" placeholder="Username or email" type="text" >
+                            <small id="emailError" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
-                            <input class="form-control" name="password" placeholder="Password" type="password">
+                            <input class="form-control" name="password" id="password" placeholder="Password" type="password" >
+                            <small id="passwordError" class="text-danger"></small>
                         </div>
                         
-
-                       <%if(locals.message&&message.length>0){%>
-                        <div class="alert alert-danger text-center ">
-                            
+                        <%if(locals.message && message.length > 0) { %>
+                        <div class="alert alert-danger text-center">
                             <%=message%>
-
                         </div>
-                       <%}%>
+                        <% } %>
                                       
                         <div class="mb-3">
                             <a href="#" class="float-end font-sm text-muted">Forgot password?</a>
@@ -58,10 +52,10 @@
                         </div> 
 
                         <div class="mb-4">
-                            <button type="submit" class="btn btn-primary w-100"> Login </button>
-                        </div> 
-                        
+                            <button type="submit" class="btn btn-primary w-100">Login</button>
+                        </div>
                     </form>
+                    
                     <p class="text-center small text-muted mb-15">or sign up with</p>
                     <div class="d-grid gap-3 mb-4">
                         <a href="/auth/google" class="btn w-100 btn-light font-sm">
@@ -74,26 +68,57 @@
                         </a>
                         
                     </div>
-                    <p class="text-center mb-4">Don't have account? <a href="/signup">Sign up</a></p>
+                    <p class="text-center mb-4">Don't have an account? <a href="/signup">Sign up</a></p>
                 </div>
             </div>
         </section>
+
         <footer class="main-footer text-center">
             <p class="font-xs">
                 <script>
                 document.write(new Date().getFullYear())
                 </script>
             </p>
-           
-            
         </footer>
     </main>
+    
+
     <script src="assets/js/vendors/jquery-3.6.0.min.js"></script>
     <script src="assets/js/vendors/bootstrap.bundle.min.js"></script>
     <script src="assets/js/vendors/jquery.fullscreen.min.js"></script>
-
     <script src="assets/js/main.js" type="text/javascript"></script>
+
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            let isValid = true;
+
+ 
+            emailError.textContent = '';
+            passwordError.textContent = '';
+
+
+            const emailPattern = /^[^ ]+@[^ ]+\.[a-z]{2,3}$/;
+            if (!email.value.match(emailPattern)) {
+                emailError.textContent = 'Please enter a valid email address.';
+                isValid = false;
+            }
+
+            if (password.value.length < 6) {
+                passwordError.textContent = 'Password must be at least 6 characters long.';
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    </script>
 </body>
 
-
-</html> 
+</html>

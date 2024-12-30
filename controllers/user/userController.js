@@ -166,8 +166,8 @@ const verifyOtp=async (req,res)=>{
             })
             await saveUserData.save();
             req.session.user=saveUserData._id;
-            res.redirect("/")
-            // res.json({success:true,redirectUrl:"/"})
+            // res.redirect("/")
+            res.status(200).json({success:true,redirectUrl:"/"})
         }else{
             res.status(400).json({success:false,message:"Invalide OTP, Please try again"})
         }
@@ -401,6 +401,6 @@ module.exports ={
     login,   
     logout,
     loadShoppingPage,  
- filterProduct, 
+   filterProduct, 
 
 }

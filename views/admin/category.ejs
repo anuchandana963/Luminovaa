@@ -39,31 +39,6 @@
       background-color: #0056b3;
       border-color: #0056b3;
     }
-/* 
-    .pagination-container {
-      text-align: center;
-    }
-
-    .pagination {
-      display: inline-block;
-    }
-
-    .pagination a,
-    .pagination .current-page {
-      display: inline-block;
-      padding: 5px 10px;
-      margin: 0 2px;
-      border: 1px solid #ddd;
-      text-decoration: none;
-      color: #333;
-    }
-
-    .pagination a:hover {
-      background-color: #f5f5f5;
-    } */
-
-
-
     .pagination-container {
 display: flex;
 justify-content: center;
@@ -115,12 +90,12 @@ color: #333333;
             <form method="post" action="/admin/addCategory" onsubmit="handleFormSubmit(event)">
                 <div class="mb-4">
                     <label for="name" class="form-label">Name</label>
-                    <input type="text" name="name" placeholder="Type here" class="form-control" id="name" required />
+                    <input type="text" name="name" placeholder="Type here" class="form-control" id="name"  />
                     <div id="name-error" class="error-message"></div>
                 </div>
                 <div class="mb-4">
                     <label class="form-label">Description</label>
-                    <textarea placeholder="Type here" name="description" class="form-control" id="descriptionId" required></textarea>
+                    <textarea placeholder="Type here" name="description" class="form-control" id="descriptionId" ></textarea>
                     <div id="description-error" class="error-message"></div>
                 </div>
                 <div class="d-grid">
@@ -242,6 +217,7 @@ color: #333333;
                 throw new Error(err.error);
             });
         }
+        
         return response.json();
     })
     .then(data => {
