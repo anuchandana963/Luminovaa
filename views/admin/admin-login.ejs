@@ -1,111 +1,163 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Login</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&display=swap"
-    rel="stylesheet"
-  />
-  <link rel="stylesheet" href="/css/bootstrap.min.css" />
-  
-
-  
-  <style>
-    body,
-        html {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-image: url('/img/adminlogin.png');
-        background-size: cover;
-        background-position: center;
-        font-family: 'Nunito Sans', sans-serif;
-        color: white;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+
+        body, html {
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+
         .login-container {
-        width: 100%;
-        max-width: 500px;
-        padding: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        background-color: hsl(193, 80%, 17%);
-        border-radius: 8px;
-        }
-        .error-message {
-        color: red;
-        font-size: 0.875rem;
-        }
-        .text-center{
-        color: white;
-        padding-left: 10px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+            width: 90%;
+            max-width: 440px;
         }
 
-  </style>
+        .text-center {
+            color: #7132ed;
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #7132ed;
+            box-shadow: 0 0 0 3px rgba(113, 50, 237, 0.1);
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #7132ed, #4e6bff);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(113, 50, 237, 0.2);
+        }
+
+        ::placeholder {
+            color: #999;
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2 class="text-center">Admin Login</h2>
-    <form id="adminLoginForm" method="post" action="/admin/login">
-      <div class="form-group">
-        <label for="adminEmail">Email address</label><br>
-        <input
-          type="email"
-          class="form-control"
-          id="adminEmail"
-          name="email"
-    
-        />
-        <div id="emailError" class="error-message"></div>
-      </div>
-      <div class="form-group">
-        <label for="adminPassword">Password</label><br>
-        <input
-          type="password"
-          class="form-control"
-          id="adminPassword"
-          name="password"
-      
-        />
-        <div id="passwordError" class="error-message"></div>
-      </div>
-      <button type="submit" id="login" style="margin-left: 50px; color: rgb(255, 255, 255); margin-top: 10px; background-color: rgb(25, 25, 255);" class="btn btn-dark btn-block ">Log In</button>
-    </form>
-  </div>
-  <script src="/js/jquery.min.js"></script>
-  <script src="/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const adminLoginForm = document.getElementById("adminLoginForm");
-      const emailField = document.getElementById("adminEmail");
-      const passwordField = document.getElementById("adminPassword");
-      const emailError = document.getElementById("emailError");
-      const passwordError = document.getElementById("passwordError");
+    <div class="login-container">
+        <h2 class="text-center">Admin Login</h2>
+        <form id="adminLoginForm" method="post" action="/admin/login">
+            <div class="form-group">
+                <label for="adminEmail">Email address</label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="adminEmail"
+                    name="email"
+                    placeholder="Enter your email"
+                />
+                <div id="emailError" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="adminPassword">Password</label>
+                <input
+                    type="password"
+                    class="form-control"
+                    id="adminPassword"
+                    name="password"
+                    placeholder="Enter your password"
+                />
+                <div id="passwordError" class="error-message"></div>
+            </div>
+            <button type="submit" id="login" class="btn">Login</button>
+        </form>
+    </div>
 
-      adminLoginForm.addEventListener("submit", function (event) {
-        let isValid = true;
-        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        if (!emailPattern.test(emailField.value)) {
-          emailError.textContent = "Invalid email format";
-          isValid = false;
-        } else {
-          emailError.textContent = "";
-        }
-        if (passwordField.value.length < 6) {
-          passwordError.textContent =
-            "Password should 6 characters";
-          isValid = false;
-        } else {
-          passwordError.textContent = "";
-        }
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const adminLoginForm = document.getElementById("adminLoginForm");
+            const emailField = document.getElementById("adminEmail");
+            const passwordField = document.getElementById("adminPassword");
+            const emailError = document.getElementById("emailError");
+            const passwordError = document.getElementById("passwordError");
 
-        if (!isValid) {
-          event.preventDefault();
-        }
-      });
-    });
-  </script>
+            adminLoginForm.addEventListener("submit", function (event) {
+                let isValid = true;
+                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+                
+                if (!emailPattern.test(emailField.value)) {
+                    emailError.textContent = "Please enter a valid email address";
+                    isValid = false;
+                } else {
+                    emailError.textContent = "";
+                }
+
+                if (passwordField.value.length < 6) {
+                    passwordError.textContent = "Password must be at least 6 characters";
+                    isValid = false;
+                } else {
+                    passwordError.textContent = "";
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

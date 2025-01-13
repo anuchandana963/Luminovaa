@@ -293,6 +293,11 @@
                     displayErrorMessage('salePrice-error', 'Please enter a valid non-negative price.');
                     isValid = false;
                 }
+                if (parseFloat(price) <= parseFloat(saleprice)) {
+                displayErrorMessage('regularPrice-error', 'Regular price must be greater than sale price.');
+                isValid = false;
+            }
+
 
                 if (color.trim() === "") {
                     displayErrorMessage('color-error', 'Please enter a color.');

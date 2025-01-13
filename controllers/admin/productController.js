@@ -96,7 +96,7 @@ const getAllProducts = async (req, res) => {
 
         const category = await Category.find({ isListed: true })
 
-        if (category) {
+        if(category) {
             res.render("products", {
                 data: productData,
                 currentPage: page,
@@ -163,6 +163,8 @@ const editProduct = async (req, res) => {
 
         const product = await Product.findOne({ _id: id });
         const data = req.body;
+        console.log("data",data);
+        
         const existingProduct = await Product.findOne({
             productName: data.productName,
             _id: { $ne: id }
@@ -171,6 +173,7 @@ const editProduct = async (req, res) => {
         if (existingProduct) {
             return res.status(400).json({ error: "Product with name already exists.Please try with another name" })
         }
+        
 
         const category = await Category.findOne({name:data.category})
         console.log('imagess');
@@ -222,7 +225,6 @@ const deleteSingleImage = async (req, res) => {
         }
         const imagePath = path.join("public", "uploads", "re-image", imageNameToServer);
 
-        // Check if the image exists and delete it
         if (fs.existsSync(imagePath)) {
             fs.unlinkSync(imagePath);
             console.log(`Image ${imageNameToServer} deleted successfully`);

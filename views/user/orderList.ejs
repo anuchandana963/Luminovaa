@@ -1,0 +1,177 @@
+<%- include("../../views/partials/user/header") %>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            background-color: #fff;
+            padding: 20px;
+            border-right: 1px solid #dee2e6;
+            min-height: 100vh;
+        }
+        .sidebar a {
+            color: #666;
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+        }
+        .sidebar a:hover {
+            color: #333;
+        }
+        .status-cancelled {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-returned {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .status-shipped {
+            background-color: #ffc107;
+            color: black;
+        }
+        .status-return-request {
+            background-color: #ffc107;
+            color: black;
+        }
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar">
+                <h5 class="mb-4">Account Settings</h5>
+                <nav>
+                    <a href="/userProfile">Profile</a>
+                    <a href="#orders" class="fw-bold">Orders</a>
+                    <a href="#wishlist">Wishlist</a>
+                    <a href="/addAddress">Address</a>
+                    <a href="#wallet">Wallet</a>
+                    <a href="#logout" class="text-danger">Logout</a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <h4 class="mb-4">Your Orders</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%orders.forEach(order=>{%>
+                            <tr>
+                                <td><%=order.orderId%></td>
+                                <td><%=order.createdOn.toLocaleDateString()%></td>
+                                <td>
+                                    <span class="badge bg-<%= order.status === 'Cancelled' ? 'danger' : (order.status === 'Delivered' ? 'success' : (order.status === 'Returned' ? 'primary' : 'warning')) %>">
+                                        <%= order.status %></span> 
+                                </td>
+                                <td><%=order.finalAmount%></td>
+                                <td>
+                             <a href="/order-details?id=<%= order._id %>" class="btn btn-sm btn-success me-2">View Details</a>
+                             <% let days = (Date.now() - new Date(order.createdOn)) / (1000 * 60 * 60 * 24); %>
+                             <% if (order.status !== 'Cancelled' && order.status !== 'Delivered' && order.status !== 'Return Request' &&order.status !== 'Returned') { %>
+
+                                <button class="btn btn-sm btn-danger"
+                                   onclick="confirmCancelOrder('<%= order._id %>')">Cancel</button>
+                                        
+                                   <% }else if ( order.status=='Delivered' && days< 7 ){ %>
+                                      <button class="btn btn-sm btn-danger"
+                                       onclick="confirmReturn('<%= order._id %>')">return</button>
+                                        
+                                 <%}%>
+                             </td>
+                           </tr>
+                         <%})%>
+                     </tbody>
+                 </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmCancelOrder(orderId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!',
+                input: 'text',
+                inputPlaceholder: 'Enter reason for cancellation',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to provide a reason for cancellation!'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const reason = result.value;
+                    window.location.href = `/cancel-order?id=${orderId}&reason=${encodeURIComponent(reason)}`;
+                }
+            });
+        }
+        async function confirmReturn(orderId) {
+              try {
+                const result = await Swal.fire({
+                  title: "Return Order?",
+                  icon: "warning",
+                  text: "Reason for Returning Product",
+                  html: `<textarea id="returnReason" class="swal2-textarea" placeholder="Enter your reason here"></textarea>`,
+                  showCancelButton: true,
+                  confirmButtonText: 'Submit',
+                  cancelButtonText: 'Cancel',
+                  preConfirm: () => {
+                    const reason = document.getElementById('returnReason').value.trim();
+                    if (!reason) {
+                      Swal.showValidationMessage('Reason cannot be empty');
+                    }
+                    return reason;
+                  }
+                });
+    
+                if (result.isConfirmed) {
+                  const reason = result.value;
+    
+                  const response = await fetch('/return-request', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json', 
+                    },
+                    body: JSON.stringify({ 
+                      orderId: orderId,
+                      reason: reason,
+                    }),
+                  });
+    
+                  const responseData = await response.json();
+                  if (response.ok) {
+                    Swal.fire('Success!', responseData.message, 'success');
+                  } else {
+                    Swal.fire('Error!', responseData.message, 'error');
+                  }
+                }
+              } catch (error) {
+                console.error('Error:', error);
+                Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
+              }
+            }
+    </script>

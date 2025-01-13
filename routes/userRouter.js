@@ -4,6 +4,11 @@ const userController =require("../controllers/user/userController");
 const passport = require('passport');
 const req = require('express/lib/request');
 const productController=require("../controllers/user/productControllers");
+const profileController=require("../controllers/user/profileController")
+const cartController=require("../controllers/user/cartController") 
+const checkOutControllers=require("../controllers/user/checkOutController")
+const ordersController=require("../controllers/user/ordersController")
+
 const { adminAuth, userAuth } = require('../middlewares/auth');
 const User = require('../models/userSchema')
 
@@ -52,7 +57,52 @@ router.get('/logout',userAuth,userController.logout)
 
 //product
 router.get("/productDetails",userAuth,productController.productDetails)
+router.get("/filterPrice",userAuth,userController.filterByPrice)
+router.post("/search",userAuth,userController.searchProducts)
 
+//userProfile
+router.get("/userProfile",userAuth,profileController.userProfile)
+router.get("/edit-profile",userAuth,profileController.getEditProfile)
+router.post("/edit-profile",userAuth,profileController.EditProfile)
+
+//address
+router.get("/addAddress",userAuth,profileController.addAddress)
+router.post("/postAddAddress",userAuth,profileController.postAddAddress)
+//edit
+router.get("/editAddress",userAuth,profileController.editAddress)
+router.post("/editAddress",userAuth,profileController.postEditAddress)
+//delete
+router.get("/deleteAddress",userAuth,profileController.deleteAddress)
+
+//forgot-pass
+router.get('/forgot-password',profileController.getForgotPassPage)
+router.post('/forgotPass-otp',profileController.forgotEmailValid)
+router.post("/verify-passForgot-otp",profileController.verifyForgotPassOtp)
+router.get("/reset-password",profileController.getResetPassPage)
+router.post("/resend-forgot-otp",profileController.resendOtp)
+router.post("/reset-password",profileController.postNewPassword)
+
+
+//cart
+router.get("/showCart",userAuth,cartController.showCart)
+router.post("/addToCart",userAuth,cartController.addToCart)
+router.get("/removeCart",userAuth,cartController.removeCart)
+router.get("/clearCart",userAuth,cartController.clearCart)
+router.post("/updateQuantity",userAuth,cartController.updateQuantity)
+
+//cheakout
+router.get('/checkout',userAuth,checkOutControllers.checkout)
+router.post('/postCheckOut',userAuth,checkOutControllers.PostCheckOut)
+router.post('/place-order-initial',userAuth,checkOutControllers.placeOrderInitial)
+
+router.get('/order-confirmation',userAuth,checkOutControllers.orderConfirm)
+
+router.post('/place-order',checkOutControllers.placeOrder);
+
+//order
+router.get('/orders',userAuth,ordersController.getOrders)
+router.get('/order-details',userAuth,ordersController.getOrderDetails)
+router.get('/cancel-order',userAuth,ordersController.getOrderCancel)
 
 
 module.exports=router;
