@@ -12,7 +12,7 @@ const productDetails=async(req,res)=>{
         const product=await Product.findById(productId).populate('category')
         const findCategory=product.category;
         
-        // const categoryOffer=findCategory?.categoryOffer||0;
+        const categoryOffer=findCategory?.categoryOffer||0;
         const productOffer=product.productOffer||0;
         const totalOffer=categoryOffer+productOffer;
 
