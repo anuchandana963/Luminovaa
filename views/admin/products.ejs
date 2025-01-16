@@ -8,6 +8,7 @@
                 <th scope="col"><b>Sale Price</b></th>                   
                 <th scope="col"><b>AddOffers</b></th>
                 <th scope="col"><b>RemoveOffers</b></th>
+                <th scope="col"><b>Quantity</b></th>
                 <th scope="col"><b>Action</b></th>
                 <th scope="col"><b>Edit</b></th>
             </tr>
@@ -22,19 +23,24 @@
                 <td><%=data[i].salePrice%></td>
           
                 <td>
+                    <%if(locals.data[i].productOffer){%>
+                          <%=data[i].productOffer%>
+                    <%}else{%>
+                        0%
+                     <%}%>
                 </td>
                 <td>
-                
-                    <button class="btn btn-info" onclick="" style="width: 100px;">
+                    <%if(locals.data[i].productOffer===0){%>
+                    <button class="btn btn-info" onclick="addOffer('<%=data[i]._id%>')" style="width: 100px;">
                         <a href="#" class="text-white">Add Offer</a>
                     </button>
-        
-                    <button class="btn btn-info" onclick="" style="width: 100px;">
+                    <%}else{%>
+                    <button class="btn btn-info" onclick="removeOffer('<%=data[i]._id%>')" style="width: 100px;">
                         <a href="#" class="text-white">Remove</a>
                     </button>
-                
+                <%}%>
                 </td>
-                <td></td>
+                <td><%=data[i].quantity%></td>
                 <td>
                    <%if(data[i].isBlocked===false){%>
                     <button class="btn btn-danger" style="width: 80px;">
@@ -81,7 +87,93 @@
 
 
 
+<script>
+        
+    async function addOffer(productId) {
+        const {value:amount}=await Swal.fire({
+            title:"Offer in percentage",
+            input:'number',
+            inputLabel:'percentage',
+            inputPlaceholder:'%',
+        })
+        $.ajax({
+            url:"/admin/addProductOffer",
+            method:'POST',
+            data:{
+                percentage:amount,
+                productId:productId,
 
+            },
+            success:(response)=>{
+                if(response.status===true){
+                    
+                    Swal.fire('Offer added ','the offer has been removed','success')
+                        .then(()=>location.reload())
+                }else{
+                    Swal.fire('Failed', response.message || 'Failed to add offer', 'error');
+                }
+            }
+        })
+    }
+
+
+    function removeOffer(productId){
+        try {
+            Swal.fire({
+                title:'Remove offer',
+                text:'Are you sure ou want to remove this offer',
+                icon:'warning',
+                showCancelButton:true,
+                confirmbuttonColor:'#3085d6',
+                cancelButtonColor:'d33',
+                confirmButtonText:'Yes,Remove it!',
+                timer:5000,
+                timerProgressBar:true
+            }).then(async (result)=>{
+                if(result.isConfirmed){
+                    $.ajax({
+                        url:'/admin/removeProductOffer',
+                        method:'post',
+                        data:{
+                            productId:productId,
+                        },
+                        success:(response)=>{
+                            if(response.status===true){
+                                Swal.fire('Removed!','the offer has been removed','success')
+                                location.reload()
+
+                            }else if(response.status===false){
+                                Swal.fire('failed')
+                            }else{
+                                alert('failed')
+                            }
+                        }
+                    })
+                }
+            })
+            
+        } catch (error) {
+            console.error(error)
+            
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>

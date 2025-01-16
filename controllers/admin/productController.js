@@ -243,6 +243,54 @@ const deleteSingleImage = async (req, res) => {
 
 
 
+const addProductOffer=async (req,res)=>{
+    try {
+        const {percentage,productId}=req.body;
+        const findProduct=await Product.findOne({_id:productId})
+        const findCategory=await Category.findOne({_id:findProduct.category})
+
+        if(percentage>99){
+            return res.json({status:false,message:"Offer percentage should be less than 100."})
+        }
+
+        if(findCategory.categoryOffer>percentage){
+            return res.json({ status: false, message: "This product's category already has a category offer." });
+        }
+        const discount = Math.floor(findProduct.salePrice * (percentage / 100));
+        findProduct.salePrice = findProduct.salePrice - discount;
+
+        findProduct.productOffer = parseInt(percentage);
+        await findProduct.save();
+
+        findCategory.categoryOffer = 0;
+        await findCategory.save();
+
+        res.json({ status: true });
+
+    } catch (error) {
+        console.error(error);
+        res.redirect('/admin/pageerror');
+    }
+}
+
+
+const removeProductOffer=async (req,res)=>{
+    try {
+        const {productId}=req.body;
+        let findProduct=await Product.findOne({_id:productId})
+        const percentage = findProduct.productOffer;
+        findProduct.salePrice=((findProduct.salePrice*100)/(100-percentage))
+        findProduct.productOffer=0;
+        await findProduct.save()
+
+         res.json({ status: true });
+    } catch (error) {
+        console.error(error);
+        res.redirect('/admin/pageerror');
+    }
+}
+
+
 module.exports = {
     getProductAddPage,
     addProducts,
@@ -252,4 +300,6 @@ module.exports = {
     getEditProduct,
     editProduct,
     deleteSingleImage,
+    addProductOffer,
+    removeProductOffer,
 }

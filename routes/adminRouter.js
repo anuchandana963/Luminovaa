@@ -31,6 +31,9 @@ router.get("/listCategory",adminAuth,categoryController.getListCategory)
 router.get("/unlistCategory",adminAuth,categoryController.getUnlistCategory)
 router.get("/editCategory",adminAuth,categoryController.getEditCategory)
 router.post("/editCategory/:id",adminAuth,categoryController.editCategory)
+//offer
+router.post("/addCategoryOffer",adminAuth,categoryController.addCategoryOffer)
+router.post("/removeOffer",adminAuth,categoryController.removeOffer)
 
 
 //Product
@@ -42,8 +45,9 @@ router.get("/unblockProduct",adminAuth,productcontroller.unblockProduct)
 router.get("/editProduct",adminAuth,productcontroller.getEditProduct)
 router.post("/editProduct/:id",adminAuth,uploads.array('images',4),productcontroller.editProduct)
 router.post("/deleteImage",adminAuth,productcontroller.deleteSingleImage)
-
-
+//offer
+router.post("/addProductOffer",adminAuth,productcontroller.addProductOffer)
+router.post("/removeProductOffer",adminAuth,productcontroller.removeProductOffer)
 
 
 //order mamagement

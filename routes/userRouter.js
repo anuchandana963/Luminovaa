@@ -8,6 +8,8 @@ const profileController=require("../controllers/user/profileController")
 const cartController=require("../controllers/user/cartController") 
 const checkOutControllers=require("../controllers/user/checkOutController")
 const ordersController=require("../controllers/user/ordersController")
+const wishlistController=require("../controllers/user/wishlistController")
+
 
 const { adminAuth, userAuth } = require('../middlewares/auth');
 const User = require('../models/userSchema')
@@ -105,5 +107,11 @@ router.get('/orders',userAuth,ordersController.getOrders)
 router.get('/order-details',userAuth,ordersController.getOrderDetails)
 router.get('/cancel-order',userAuth,ordersController.getOrderCancel)
 
+
+
+//wishlist
+router.get("/wishlist",userAuth,wishlistController.getWishlist)
+router.post("/addToWishlist",userAuth,wishlistController.addToWishlist)
+router.delete("/removeFromWishlist",userAuth,wishlistController.removeWishlist)
 
 module.exports=router;

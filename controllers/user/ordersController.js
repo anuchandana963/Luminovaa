@@ -11,7 +11,7 @@ const getOrders=async (req,res)=>{
         res.redirect("/login")
        }
        
-       const orders=await Order.find({user})
+       const orders=await Order.find({user}).sort({createdOn:-1})
        console.log("orders",orders);
        res.render("orderList",{orders})
 

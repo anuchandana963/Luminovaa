@@ -29,6 +29,7 @@ const showCart=async (req,res)=>{
 const addToCart=async (req,res)=>{
    try {
         const userId=req.session.user;
+        console.log("add to cart invoked")
         
         if(!userId){
         return res.status(404).redirect("/login")
@@ -41,7 +42,7 @@ const addToCart=async (req,res)=>{
         
         const product= await Product.findOne({_id:productId})
         console.log(userId);
-        
+        console.log("sale price:",product.salePrice);
         const productPrice=product.salePrice
         const productQuantity=product.quantity
         if(quantityNumber>productQuantity){

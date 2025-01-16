@@ -6,73 +6,116 @@
         <div class="row mb-50">
             <div class="form-group col-md-4">
                 <label for="addressType">Address Type:</label>
-                <input type="text" class="form-control border-3" value="<%= address.addressType %>" id="addressType" name="addressType" required>
+                <input type="text" class="form-control border-3" value="<%= address.addressType %>" id="addressType" name="addressType" >
             </div>
             <div class="form-group col-md-4">
                 <label for="name">Name:</label>
-                <input type="text" class="form-control border-3" value="<%= address.name %>" id="name" name="name" required>
+                <input type="text" class="form-control border-3" value="<%= address.name %>" id="name" name="name" >
             </div>
             <div class="form-group col-md-4">
                 <label for="city">City:</label>
-                <input type="text" class="form-control border-3" id="city" value="<%= address.city %>" name="city" required>
+                <input type="text" class="form-control border-3" id="city" value="<%= address.city %>" name="city" >
             </div>
         </div>
         <div class="row mb-3">
             <div class="form-group col-md-4">
                 <label for="landMark">Landmark:</label>
-                <input type="text" class="form-control border-3" value="<%= address.landMark%>" id="landMark" name="landMark" required>
+                <input type="text" class="form-control border-3" value="<%= address.landMark%>" id="landMark" name="landMark" >
             </div>
             <div class="form-group col-md-4">
                 <label for="state">State:</label>
-                <input type="text" class="form-control border-3" value="<%= address.state %>" id="state" name="state" required>
+                <input type="text" class="form-control border-3" value="<%= address.state %>" id="state" name="state">
             </div>
             <div class="form-group col-md-4">
                 <label for="pincode">Pincode:</label>
-                <input type="number" class="form-control border-3" value="<%= address.pincode %>" id="pincode" name="pincode" required>
+                <input type="number" class="form-control border-3" value="<%= address.pincode %>" id="pincode" name="pincode" >
             </div>
         </div>
         <div class="row mb-3">
             <div class="form-group col-md-4">
                 <label for="phone">Phone:</label>
-                <input type="number" class="form-control border-3" id="phone" value="<%= address.phone %>" name="phone" required>
+                <input type="number" class="form-control border-3" id="phone" value="<%= address.phone %>" name="phone" >
             </div>
             <div class="form-group col-md-4">
                 <label for="altPhone">Alternate Phone:</label>
-                <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone" required>
+                <input type="number" class="form-control border-3" id="altPhone" value="<%= address.altPhone %>" name="altPhone" >
             </div>
         </div>
         <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
     </form>
     </div>
 
-
     <script>
-    document.getElementById('submitButton').addEventListener('click', function (event) {
-        if (!validateForm()) {
-            event.preventDefault();
-        }
-    });
-
-
-    function validateForm() {
-        let isValid = true;
-        const requiredFields = ["addressType", "name", "city", "landMark", "state", "pincode", "phone", "altPhone"];
-        requiredFields.forEach(function (field) {
-            const input = document.getElementById(field);
-            if (input.value.trim() === "") {
-                Swal.fire({
-                    title: 'Error',
-                    text: `Please fill all the field.`,
-                    icon: 'error'
+        document.addEventListener("DOMContentLoaded", function () {
+            const requiredFields = [
+                { id: "addressType", message: "Address type is required" },
+                { id: "name", message: "Name is required" },
+                { id: "city", message: "City is required" },
+                { id: "landMark", message: "Landmark is required" },
+                { id: "state", message: "State is required" },
+                { id: "pincode", message: "Pincode must be 6 digits", pattern: /^\d{6}$/ },
+                { id: "phone", message: "Phone number must be 10 digits", pattern: /^\d{10}$/ },
+                { id: "altPhone", message: "Alternate phone must be 10 digits", pattern: /^\d{10}$/ }
+            ];
+    
+            // Attach real-time validation
+            requiredFields.forEach(field => {
+                const input = document.getElementById(field.id);
+                input.addEventListener("blur", function () {
+                    validateField(input, field);
                 });
-                isValid = false;
+            });
+    
+            document.getElementById('addressForm').addEventListener('submit', function (event) {
+                let isValid = true;
+    
+                requiredFields.forEach(field => {
+                    const input = document.getElementById(field.id);
+                    if (!validateField(input, field)) {
+                        isValid = false;
+                    }
+                });
+    
+                if (!isValid) {
+                    event.preventDefault();
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Please correct the errors before submitting.',
+                        icon: 'error'
+                    });
+                }
+            });
+    
+            function validateField(input, field) {
+                const errorElement = input.nextElementSibling;
+    
+                // Clear previous error message
+                if (errorElement && errorElement.classList.contains('error-message')) {
+                    errorElement.remove();
+                }
+    
+                if (input.value.trim() === "") {
+                    showError(input, field.message);
+                    return false;
+                }
+    
+                if (field.pattern && !field.pattern.test(input.value.trim())) {
+                    showError(input, field.message);
+                    return false;
+                }
+    
+                return true;
+            }
+    
+            function showError(input, message) {
+                const errorElement = document.createElement('div');
+                errorElement.className = 'error-message text-danger';
+                errorElement.innerText = message;
+                input.parentNode.appendChild(errorElement);
             }
         });
-
-
-        return isValid;
-    }
     </script>
+    
     <br><br><br><br><br><br><br><br><br><br>
 <%- include("../../views/partials/user/footer") %>
 
