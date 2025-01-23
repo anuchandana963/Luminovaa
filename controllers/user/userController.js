@@ -1,7 +1,7 @@
 const User = require("../../models/userSchema")
 const Category = require("../../models/categorySchema")
 const Product = require("../../models/productSchema")
-const session=require('express-session')
+const session = require('express-session')
 const env = require('dotenv').config()
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
@@ -289,8 +289,8 @@ const logout = async (req, res) => {
 const loadShoppingPage = async (req, res) => {
     try {
         const user = req.session.user;
-        
-        
+
+
         const userData = await User.findOne({ _id: user });
         const categorise = await Category.find({ isListed: true })
         const categoryId = categorise.map((category) => category._id.toString())
@@ -386,7 +386,7 @@ const filterProduct = async (req, res) => {
 const filterByPrice = async (req, res) => {
     try {
         console.log('filtering page');
-        
+
         const user = req.session.user
         const userData = await User.find({ _id: user })
         const category = await Category.find({ isListed: true }).lean()
@@ -436,7 +436,7 @@ const searchProducts = async (req, res) => {
 
         const category = await Category.find({ isListed: true }).lean();
         const categoryIds = category.map(category => category._id.toString())
-        let  searchResult
+        let searchResult
         if (req.session.filteredProducts && req.session.filteredProducts.length > 0) {
             search = req.session.filteredProducts.filter(product => {
                 return product.productName.toLowerCase().includes(search.toLowerCase())
@@ -491,5 +491,5 @@ module.exports = {
     filterProduct,
     filterByPrice,
     searchProducts,
-    
-    }
+
+}

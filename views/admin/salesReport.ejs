@@ -1,0 +1,841 @@
+<%- include('../partials/admin/header') %>
+<style>
+  /* Modern Dashboard Layout */
+.content-wrapper {
+    margin-left: 250px;
+    padding: 30px;
+    background: #f8fafc;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+}
+
+/* Header Styling */
+.heading {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+/* Export Buttons */
+.export-buttons .btn {
+    padding: 10px 20px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.btn-primary {
+    background: #3b82f6;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: #22c55e;
+    border: none;
+}
+
+.btn-success:hover {
+    background: #16a34a;
+    transform: translateY(-1px);
+}
+
+/* Date Filter Section */
+.form-select, .form-control {
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.form-select:focus, .form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-label {
+    font-weight: 500;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+/* Summary Cards */
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.04);
+}
+
+.icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    transition: all 0.3s ease;
+}
+
+.icon-wrapper.blue {
+    background: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+.icon-wrapper.green {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+}
+
+.icon-wrapper.yellow {
+    background: rgba(234, 179, 8, 0.1);
+    color: #eab308;
+}
+
+.icon-wrapper.purple {
+    background: rgba(168, 85, 247, 0.1);
+    color: #a855f7;
+}
+
+.summary-card .content h6 {
+    color: #64748b;
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.summary-card .content h3 {
+    color: #1e293b;
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* Table Styling */
+.card {
+    background: white;
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    margin-top: 30px;
+}
+
+.table {
+    margin: 0;
+}
+
+.table thead th {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+/* Remove bullets from lists in table cells */
+.table tbody td ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.table tbody td ul li {
+    padding: 2px 0;
+}
+
+/* Remove default list styling for all lists in table */
+.table tbody td > div {
+    margin: 2px 0;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-success {
+    color: #22c55e !important;
+}
+
+/* Pagination */
+.pagination {
+    gap: 6px;
+    margin-top: 30px;
+}
+
+.pagination .page-link {
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background: #f8fafc;
+    color: #3b82f6;
+    border-color: #e2e8f0;
+}
+
+.pagination .page-item.active .page-link {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content-wrapper {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .summary-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .summary-card .content h3 {
+        font-size: 24px;
+    }
+
+    .heading {
+        font-size: 28px;
+    }
+}
+
+/* Additional Enhancements */
+.table-responsive {
+    border-radius: 16px;
+}
+
+.bi {
+    line-height: 1;
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Animation for cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.summary-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.summary-card:nth-child(1) { animation-delay: 0.1s; }
+.summary-card:nth-child(2) { animation-delay: 0.2s; }
+.summary-card:nth-child(3) { animation-delay: 0.3s; }
+.summary-card:nth-child(4) { animation-delay: 0.4s; }
+
+
+.table tbody td {
+    padding: 16px;
+    vertical-align: middle;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+.table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-success {
+    color: #22c55e !important;
+}
+
+/* Pagination */
+.pagination {
+    gap: 6px;
+    margin-top: 30px;
+}
+
+.pagination .page-link {
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pagination .page-link:hover {
+    background: #f8fafc;
+    color: #3b82f6;
+    border-color: #e2e8f0;
+}
+
+.pagination .page-item.active .page-link {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .content-wrapper {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .summary-card {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+    }
+
+    .summary-card .content h3 {
+        font-size: 24px;
+    }
+
+    .heading {
+        font-size: 28px;
+    }
+}
+
+/* Additional Enhancements */
+.table-responsive {
+    border-radius: 16px;
+}
+
+.bi {
+    line-height: 1;
+}
+
+button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Animation for cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.summary-card {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.summary-card:nth-child(1) { animation-delay: 0.1s; }
+.summary-card:nth-child(2) { animation-delay: 0.2s; }
+.summary-card:nth-child(3) { animation-delay: 0.3s; }
+.summary-card:nth-child(4) { animation-delay: 0.4s; }
+    </style>
+<div class="content-wrapper">
+    <div class="container-fluid">
+        <!-- Header with Title and Export Buttons -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="heading">Sales Report</h2>
+            <div class="export-buttons">
+                <button class="btn btn-primary me-2" onclick="exportToPDF()">
+                    <i class="bi bi-file-pdf me-1"></i> Export PDF
+                </button>
+                <button class="btn btn-success" onclick="exportToExcel()">
+                    <i class="bi bi-file-excel me-1"></i> Export Excel
+                </button>
+            </div>
+        </div>
+
+    <!-- Date filter section -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="form-group">
+                <select class="form-select" name="dateRange" id="dateRangeSelect">
+                    <option value="">Select Date Range</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="d-flex gap-3">
+                <div class="form-group">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" id="startDate" class="form-control" placeholder="mm/dd/yyyy">
+                </div>
+                <div class="form-group">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" id="endDate" class="form-control" placeholder="mm/dd/yyyy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="summary-card">
+                <div class="icon-wrapper blue">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="content">
+                    <h6>Total Sales</h6>
+                    <h3>₹<%= typeof totalSales !== 'undefined' ? totalSales.toLocaleString() : '0' %></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="summary-card">
+                <div class="icon-wrapper green">
+                    <i class="bi bi-cart"></i>
+                </div>
+                <div class="content">
+                    <h6>Total Orders</h6>
+                    <h3><%= count %></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="summary-card">
+                <div class="icon-wrapper yellow">
+                    <i class="bi bi-tag"></i>
+                </div>
+                <div class="content">
+                    <h6>Total Discount</h6>
+                    <h3>₹<%= typeof totalDiscount !== 'undefined' ? totalDiscount.toLocaleString() : '0' %></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="summary-card">
+                <div class="icon-wrapper purple">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="content">
+                    <h6>Total Customers</h6>
+                    <h3><%= typeof uniqueCustomers !== 'undefined' ? uniqueCustomers : '0' %></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table section -->
+    <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="salesTable">
+                        <thead>
+                            <tr>
+                                <th>Sl No</th>
+                                <th>User Name</th>
+                                <th>Products</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                                <th>Discount</th>
+                                <th>Final Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% orders.forEach((order, index) => { %>
+                            <tr>
+                                <td><%= ((currentPage - 1) * limit) + index + 1 %></td>
+                                <td><%= order.user.name %></td>
+                                <td>
+                                    <% order.orderedItems.forEach(item => { %>
+                                        <div><%= item.product.productName %></div>
+                                    <% }) %>
+                                </td>
+                                <td>
+                                    <% order.orderedItems.forEach(item => { %>
+                                        <div><%= item.quantity %></div>
+                                    <% }) %>
+                                </td>
+                                <td><%= order.createdOn.toLocaleDateString() %></td>
+                                <td class="text-danger">₹<%= order.discount.toLocaleString() %></td>
+                                <td class="text-success">₹<%= order.finalAmount.toLocaleString() %></td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+    <!-- Updated Pagination section -->
+    <div class="d-flex justify-content-center mt-4">
+        <nav aria-label="Sales Pagination">
+            <ul class="pagination" id="pagination">
+                <!-- Pagination will be dynamically generated -->
+            </ul>
+        </nav>
+    </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+    function exportToPDF() {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const dateRangeSelect = document.getElementById('dateRangeSelect');
+
+    const today = new Date(); // Correct initialization
+    let startDate = startDateInput.value ? new Date(startDateInput.value) : new Date();
+    let endDate = endDateInput.value ? new Date(endDateInput.value) : today;
+
+    switch (dateRangeSelect.value) {
+        case 'today':
+            startDate = new Date(today); // Set startDate as today
+            endDate = new Date(today); // Set endDate as today
+            break;
+        case 'week':
+            startDate.setDate(today.getDate() - 7); // 7 days before today
+            break;
+        case 'month':
+            startDate.setMonth(today.getMonth() - 1); // 1 month before today
+            break;
+        case 'year':
+            startDate.setFullYear(today.getFullYear() - 1); // 1 year before today
+            break;
+        default:
+            startDate = '';
+            endDate = '';
+            break;
+    }
+    if(startDate!=''){
+        startDate=startDate.toISOString()
+
+    }else if(endDate!=''){
+        endDate=endDate.toISOString()
+
+    }
+
+    // Ensure the startDate and endDate are in ISO string format for URL parameters
+    const params = new URLSearchParams({
+        start: startDate,
+        end: endDate
+    });
+
+    fetch(`/admin/salesReportPDF?${params.toString()}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch the PDF');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // Create a blob URL
+            const url = window.URL.createObjectURL(blob);
+
+            // Create a temporary link element
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'salesReport.pdf'; // Specify the file name
+            document.body.appendChild(a);
+
+            // Trigger the download
+            a.click();
+
+            // Cleanup
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('Error downloading the PDF:', error);
+            alert('Failed to download the sales report. Please try again.');
+        });
+}
+
+
+    function exportToExcel() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const dateRangeSelect = document.getElementById('dateRangeSelect');
+
+        const today = new Date(); // Correct initialization
+        let startDate = startDateInput.value ? new Date(startDateInput.value) : new Date();
+        let endDate = endDateInput.value ? new Date(endDateInput.value) : today;
+
+        switch (dateRangeSelect.value) {
+            case 'today':
+                startDate = new Date(today); // Set startDate as today
+                endDate = new Date(today); // Set endDate as today
+                break;
+            case 'week':
+                startDate.setDate(today.getDate() - 7); // 7 days before today
+                break;
+            case 'month':
+                startDate.setMonth(today.getMonth() - 1); // 1 month before today
+                break;
+            case 'year':
+                startDate.setFullYear(today.getFullYear() - 1); // 1 year before today
+                break;
+            default:
+                startDate = '';
+                endDate = '';
+                break;
+        }
+        if(startDate!=''){
+            startDate=startDate.toISOString()
+
+        }else if(endDate!=''){
+            endDate=endDate.toISOString()
+
+        }
+
+        // Ensure the startDate and endDate are in ISO string format for URL parameters
+        const params = new URLSearchParams({
+            start: startDate,
+            end: endDate
+        });
+
+        fetch(`/admin/salesReportExcel?${params.toString()}`)
+        .then(response => response.blob()) // Get the response as a blob (binary data)
+                .then(blob => {
+                    // Create a link element to trigger the download
+                    const link = document.createElement('a');
+                    const url = URL.createObjectURL(blob);
+                    link.href = url;
+                    link.download = 'generated-file.xlsx'; // Default file name
+                    link.click(); // Programmatically click the link to trigger download
+                    URL.revokeObjectURL(url); // Clean up the URL object
+                })
+                .catch(error => {
+                    console.error('Error downloading the file:', error);
+                });
+    }
+
+    const dateRangeFormHtml = `
+        <div class="mb-4 d-flex gap-3">
+            <div class="input-group" style="width: 200px;">
+                <select class="form-control" name="dateRange" id="dateRangeSelect">
+                    <option value="">Select Date Range</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+            </div>
+        </div>`;
+
+    // Replace your existing date filter JavaScript with this updated version
+    function initializeDateFilter() {
+        const startDateInput = document.getElementById('startDate');
+        const endDateInput = document.getElementById('endDate');
+        const table = document.getElementById('salesTable');
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = tbody.getElementsByTagName('tr');
+        const dateRangeSelect = document.getElementById('dateRangeSelect');
+        console.log(startDateInput.value);
+        console.log('hdhj');
+        console.log(endDateInput.value);
+        console.log('hdhj');
+        console.log(dateRangeSelect.value);
+
+        // Helper function to parse date
+        function parseDate(dateStr) {
+            const [day,month,year] = dateStr.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        }
+
+        function formatCurrency(amount) {
+            return amount.toLocaleString('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).replace('INR', '₹');
+        }
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        function filterTable(page) {
+            const dateRangeSelect = document.getElementById('dateRangeSelect').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            const itemsPerPage = 10;
+
+            // Prepare the query parameters
+            const params = new URLSearchParams();
+            if (dateRangeSelect) params.append('dateRange', dateRangeSelect);
+            if (startDate) params.append('startDate', startDate);
+            if (endDate) params.append('endDate', endDate);
+            params.append('page', page);
+            params.append('limit', itemsPerPage);
+
+            // Fetch filtered data from the server
+            fetch(`/admin/filterSales?${params.toString()}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update the table with the filtered data
+                    const tableBody = document.querySelector('#salesTable tbody');
+                    tableBody.innerHTML = ''; // Clear existing rows
+
+                    data.orders.forEach((order, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index +1+ (page-1)*10}</td>
+                            <td>${order.user.name}</td>
+                            <td>
+                                <ul>${order.orderedItems.map(item => `<li>${item.product.productName}</li>`).join('')}</ul>
+                            </td>
+                            <td>
+                                <ul>${order.orderedItems.map(item => `<li>${item.quantity}</li>`).join('')}</ul>
+                            </td>
+                            <td>${new Date(order.createdOn).toLocaleDateString()}</td>
+                            <td>₹${order.discount.toLocaleString()}</td>
+                            <td>₹${order.finalAmount.toLocaleString()}</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                    updatePagination(data.totalPages, page);
+                })
+                .catch(error => {
+                    console.error('Error fetching filtered data:', error);
+                    alert('Failed to apply filters. Please try again.');
+                });
+        }
+
+        function updatePagination(totalPages, currentPage) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = ''; // Clear existing pagination
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = `page-item ${i === currentPage ? 'active' : ''}`;
+                const button = document.createElement('button');
+                button.className = 'page-link';
+                button.textContent = i;
+                button.dataset.page = i; // Store the page number in a data attribute
+
+                button.addEventListener('click', () => {
+                    filterTable(i); // Call filterTable with the page number
+                });
+
+                pageItem.appendChild(button);
+                pagination.appendChild(pageItem);
+            }
+        }
+
+        
+
+        function handleDateRangeSelection(e) {
+            e.preventDefault();
+
+            const today = new Date();
+            // today.setHours(0, 0, 0, 0);
+
+            const startDate = new Date(today);
+
+            switch (this.value) {
+                case 'today':
+                    startDateInput.value = today.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'week':
+                    startDate.setDate(today.getDate() - 7);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'month':
+                    startDate.setMonth(today.getMonth() - 1);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                case 'year':
+                    startDate.setFullYear(today.getFullYear() - 1);
+                    startDateInput.value = startDate.toISOString().split('T')[0];
+                    endDateInput.value = today.toISOString().split('T')[0];
+                    break;
+                default:
+                    startDateInput.value = '';
+                    endDateInput.value = '';
+                    break;
+            }
+            filterTable(1);
+        }
+
+
+        dateRangeSelect.addEventListener('change', handleDateRangeSelection);
+        startDateInput.addEventListener('change', filterTable);
+        endDateInput.addEventListener('change', filterTable);
+
+        filterTable(1);
+    }
+
+    document.addEventListener('DOMContentLoaded', initializeDateFilter);
+
+</script>
+
+<%- include('../partials/admin/footer') %>

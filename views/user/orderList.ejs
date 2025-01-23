@@ -48,7 +48,7 @@
                 <nav>
                     <a href="/userProfile">Profile</a>
                     <a href="#orders" class="fw-bold">Orders</a>
-                    <a href="#wishlist">Wishlist</a>
+                    <a href="/wishlist">Wishlist</a>
                     <a href="#address">Address</a>
                     <a href="#wallet">Wallet</a>
                     <a href="#logout" class="text-danger">Logout</a>
@@ -129,49 +129,64 @@
                 }
             });
         }
+
         async function confirmReturn(orderId) {
-              try {
-                const result = await Swal.fire({
-                  title: "Return Order?",
-                  icon: "warning",
-                  text: "Reason for Returning Product",
-                  html: `<textarea id="returnReason" class="swal2-textarea" placeholder="Enter your reason here"></textarea>`,
-                  showCancelButton: true,
-                  confirmButtonText: 'Submit',
-                  cancelButtonText: 'Cancel',
-                  preConfirm: () => {
-                    const reason = document.getElementById('returnReason').value.trim();
-                    if (!reason) {
-                      Swal.showValidationMessage('Reason cannot be empty');
-                    }
-                    return reason;
-                  }
-                });
-    
-                if (result.isConfirmed) {
-                  const reason = result.value;
-    
-                  const response = await fetch('/return-request', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json', 
-                    },
-                    body: JSON.stringify({ 
-                      orderId: orderId,
-                      reason: reason,
-                    }),
-                  });
-    
-                  const responseData = await response.json();
-                  if (response.ok) {
-                    Swal.fire('Success!', responseData.message, 'success');
-                  } else {
-                    Swal.fire('Error!', responseData.message, 'error');
-                  }
+    try {
+   
+        const result = await Swal.fire({
+            title: "Return Order?",
+            icon: "warning",
+            text: "Reason for Returning Product",
+            html: `<textarea id="returnReason" class="swal2-textarea" placeholder="Enter your reason here"></textarea>`,
+            showCancelButton: true,
+            confirmButtonText: "Submit",
+            cancelButtonText: "Cancel",
+            preConfirm: () => {
+                const reason = document.getElementById("returnReason").value.trim();
+                if (!reason) {
+                    Swal.showValidationMessage("Reason cannot be empty");
                 }
-              } catch (error) {
-                console.error('Error:', error);
-                Swal.fire('Error!', 'Something went wrong. Please try again.', 'error');
-              }
+                return reason;
+            },
+        });
+
+
+        if (result.isConfirmed) {
+            const reason = result.value;
+
+            const response = await fetch("/return-request", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    orderId,
+                    reason,
+                }),
+            });
+
+            const responseText = await response.text();
+
+            let responseData;
+            try {
+                responseData = JSON.parse(responseText); 
+            } catch (error) {
+                console.error("Error parsing response as JSON:", error);
+                Swal.fire("Error!", "The server response is not valid JSON. Please check the server.", "error");
+                return;
             }
+
+            if (response.ok) {
+                Swal.fire("Success!", responseData.message, "success");
+            } else {
+                Swal.fire("Error!", responseData.message, "error");
+            }
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        Swal.fire("Error!", "Something went wrong. Please try again.", "error");
+    }
+}
+
+
     </script>

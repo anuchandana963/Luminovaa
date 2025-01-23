@@ -6,6 +6,8 @@ const customerController=require("../controllers/admin/customerController")
 const categoryController=require("../controllers/admin/categoryController")
 const productcontroller=require("../controllers/admin/productController")
 const orderControllers=require("../controllers/admin/ordersController")
+const couponController=require("../controllers/admin/couponController")
+
 const {userAuth,adminAuth}=require("../middlewares/auth")
 const storage = require('../helpers/multer')
 const uploads = multer({ storage: storage });
@@ -53,8 +55,32 @@ router.post("/removeProductOffer",adminAuth,productcontroller.removeProductOffer
 //order mamagement
 router.get('/orders',adminAuth,orderControllers.getAllorders)
 router.post('/update-order-status',orderControllers.updateOrderStatus);
+
 router.get('/getReturnRequest',adminAuth,orderControllers.getReturnPage)
 router.post('/returnDataUpdate',adminAuth,orderControllers.returnRequest);
 router.get('/orderDetails',orderControllers.getOrderDetail)
+
+
+
+//coupon
+router.get('/add-coupon',couponController.getCoupon)
+router.post('/add-coupon',couponController.addCoupon)
+router.get('/delete-coupon/:id',couponController.deleteCoupon)
+
+
+
+//slese report
+
+router.get('/salesReportPDF',orderControllers.pdfGenerate)
+router.get('/salesReportExcel',orderControllers.excelGenerate)
+router.get('/saleReport',orderControllers.getSaleReport)
+router.get('/saleReport',orderControllers.getSaleReport)
+router.get('/filterSales',orderControllers.getSaleReportFilter)
+router.get('/salesReportPDF',orderControllers.pdfGenerate)
+router.get('/salesReportExcel',orderControllers.excelGenerate)
+
+
+
+
 
 module.exports=router

@@ -3,9 +3,10 @@ const User=require('../../models/userSchema')
 const Order =require('../../models/orderSchema')
 const Product =require('../../models/productSchema')
 const Address = require('../../models/addressSchema')
- 
+const PDFDocument = require('pdfkit');
 const Return = require('../../models/returnSchema')
-
+const Wallet = require('../../models/walletSchema')
+const ExcelJS = require('exceljs');
 
 
 const getAllorders=async (req,res)=>{
@@ -79,11 +80,12 @@ const getSaleReport=async (req,res)=>{
 
 
     } catch (error) {
-        
+        console.error(error);
+        res.redirect("/pageerror")
     }
 }
 
-const getReturnPage= async (req,res)=>{
+const  getReturnPage= async (req,res)=>{
     try {
         const limit =5;
         
@@ -103,43 +105,68 @@ const getReturnPage= async (req,res)=>{
         res.redirect('/pageeorror')
     }
 }
-const returnRequest= async (req,res)=>{
+
+
+const returnRequest = async (req, res) => {
     try {
-        const status=req.body.status;
-        const returnId=req.query.id;
+        const status = req.body.status;
+        const returnId = req.query.id;
+
+        console.log('Return ID:', returnId);
 
         const returnData = await Return.findById(returnId);
-        if(!returnData){
-            return res.json({message:'retun id not fount'})
-
+        if (!returnData) {
+            return res.json({message: 'return id not found'});
         }
-        const orderId=returnData.orderId;
-        const userId=returnData.userId;
-        const amount=returnData.refundAmount;
-        console.log(orderId);
 
-        if(status=='approved'){
-            const wallet=await Wallet.findOneAndUpdate({userId},{$inc:{balance:amount},$push:{transactions:{type:'Refund',amount,orderId,description:'Refund for your returned product'}}})
-            returnData.returnStatus ='approved';
-            await returnData.save();
-            await Order.findByIdAndUpdate(orderId,{$set:{status:'Returned'}})
+        console.log('Return Data:', returnData);
 
-        }else if(status=='rejected'){
-            returnData.returnStatus =status;
-            await returnData.save();
-            await Order.findByIdAndUpdate(orderId,{$set:{status:'Return Requeest'}})
+        const orderId = returnData.orderId;
+        const userId = returnData.userId;
+        const amount = returnData.refundAmount;
 
-        }else{
-            return res.status(400).json({message:'something wend wrong'})
+        if (status === 'approved') {
+            try {
+                const walletUpdate = await Wallet.findOneAndUpdate(
+                    {userId},
+                    {
+                        $inc: {balance: amount},
+                        $push: {
+                            transactions: {
+                                type: 'Refund',
+                                amount,
+                                orderId,
+                                description: 'Refund for your returned product'
+                            }
+                        }
+                    },
+                    {new: true} // Return updated document
+                );
+                
+                // if (!walletUpdate) {
+                //     console.log('Wallet not found for user:', userId);
+                //     return res.status(404).json({message: 'Wallet not found'});
+                // }
+
+                returnData.returnStatus = 'approved';
+                await returnData.save();
+                await Order.findByIdAndUpdate(orderId, {$set: {status: 'Returned'}});
+                
+            } catch (walletError) {
+                console.error('Wallet update error:', walletError);
+                return res.status(500).json({message: 'Error updating wallet'});
+            }
         }
-        res.redirect('/admin/getReturnRequest')
-
+      
+        
+        res.redirect('/admin/getReturnRequest');
 
     } catch (error) {
-        res.redirect('/admin/pageerror')
-        
+        console.error('Full error:', error);
+        res.redirect('/admin/pageerror');
     }
-}
+};
+
 
 const pdfGenerate = async (req, res) => {
     try {
@@ -341,7 +368,7 @@ const excelGenerate=async (req, res) => {
         ];
     
        
-        for(let i=0;i<orders.length;i++){
+        for(let i=0;i<orders.length;i++){ 
             console.log(orders[i].orderedItems[0].product.productName||'prod');
             const productDetails = orders[i].orderedItems
                     .map((product) => `${product.product.productName} (x${product.quantity})`)

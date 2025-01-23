@@ -4,7 +4,20 @@ const Product = require('../../models/productSchema')
 const Category = require('../../models/categorySchema')
 const Address = require('../../models/addressSchema')
 const Order = require('../../models/orderSchema')
+const Razorpay = require('razorpay');
+const { post } = require('../../routes/adminRouter')
+const crypto = require('crypto');
 
+
+
+const razorpay = new Razorpay({
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+
+const RAZORPAY_MAX_AMOUNT = 5000000000;
+const RAZORPAY_MIN_AMOUNT = 100;
 
 
 
@@ -12,7 +25,7 @@ const checkout = async (req, res) => {
     try {
         const userId = req.session.user;
         const productId = req.query.id;
-        console.log('productId', productId);
+        console.log('product id passed', productId);
 
 
         if (!userId) {
@@ -20,7 +33,10 @@ const checkout = async (req, res) => {
             return res.redirect('/login')
         }
 
-        const address = await Address.findOne({ userId })
+
+        const userData= await User.find({user:userId})
+
+        const address = await Address.findOne({ userId})
         const addresses = address ? address.address : [];
  
         let totalPrice = 0;
@@ -44,7 +60,7 @@ const checkout = async (req, res) => {
             }
 
             totalPrice = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-            return res.render('checkout', { cart, products: cart.items, address: addresses, totalPrice, product: null })
+            return res.render('checkout', {user:userData, cart, products: cart.items, address: addresses, totalPrice, product: null })
 
         }
     } catch (error) {
@@ -52,6 +68,190 @@ const checkout = async (req, res) => {
         res.render('page-404')
     }
 }
+
+
+
+
+const verifyPayment = async (req, res) => {
+    try {
+        const {
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+        } = req.body;
+
+        if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required payment verification parameters'
+            });
+        }
+
+        if (!req.session.razorpayOrderId || !req.session.razorpayOrderExpiry ||
+            Date.now() > req.session.razorpayOrderExpiry) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order session has expired'
+            });
+        }
+
+        const sign = razorpay_order_id + "|" + razorpay_payment_id;
+        const expectedSign = crypto
+            .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+            .update(sign.toString())
+            .digest("hex");
+
+        if (razorpay_signature !== expectedSign) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid payment signature'
+            });
+        }
+
+        if (req.session.razorpayOrderId !== razorpay_order_id) {
+            return res.status(400).json({
+                success: false,
+                message: 'Order verification failed'
+            });
+        }
+
+        const payment = await razorpay.payments.fetch(razorpay_payment_id);
+
+        if (payment.status !== 'captured') {
+            return res.status(400).json({
+                success: false,
+                message: `Payment not captured. Current status: ${payment.status}`
+            });
+        }
+
+        delete req.session.razorpayOrderId;
+        delete req.session.razorpayOrderExpiry;
+
+        res.status(200).json({
+            success: true,
+            message: 'Payment verified successfully',
+            paymentId: razorpay_payment_id,
+        });
+
+    } catch (error) {
+        console.error('Payment verification error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Payment verification failed',
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+const createOrder = async (req, res) => {
+    try {
+        const { amount, addressId } = req.body;
+        const userId = req.session.user;
+        console.log(req.body);
+
+        if (!amount || typeof amount !== 'number' || amount <= 0) {
+            console.log('not 1');
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid amount. Amount must be a positive number'
+            });
+        }
+
+        if (!addressId) {
+            console.log('not 12');
+            return res.status(400).json({
+                success: false,
+                message: 'Delivery address is required'
+            });
+        }
+
+        if (!userId) {
+            console.log('not 13');
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
+        const amountInPaise = Math.round(amount * 100);
+
+        if (amountInPaise < RAZORPAY_MIN_AMOUNT) {
+            console.log('not 14');
+            return res.status(400).json({
+                success: false,
+                message: `Amount must be at least ₹${RAZORPAY_MIN_AMOUNT / 100}`
+            });
+        }
+
+        if (amountInPaise > RAZORPAY_MAX_AMOUNT) {
+            console.log('not 15');
+            return res.status(400).json({
+                success: false,
+                message: `Amount exceeds maximum limit of ₹${RAZORPAY_MAX_AMOUNT / 100}`
+            });
+        }
+
+        // Generate unique receipt ID
+        const receipt = crypto
+            .randomBytes(16)
+            .toString('hex');
+
+            console.log('recept',receipt);
+
+        const options = {
+            amount: amountInPaise,
+            currency: 'INR',
+            receipt,
+            notes: {
+                userId: userId.toString(),
+                addressId: addressId.toString()
+            }
+        };
+
+        console.log(options);
+
+        const razorpayOrder = await razorpay.orders.create(options);
+        console.log(razorpayOrder+'razorpayOrder');
+        
+
+        // Store order ID in session with expiry
+        req.session.razorpayOrderId = razorpayOrder.id;
+        console.log(req.session.razorpayOrderId+'eq.session.razorpayOrderId');
+
+        req.session.razorpayOrderExpiry = Date.now() + (30 * 60 * 1000); // 30 minutes expiry
+        console.log('not 21');
+        res.status(200).json({
+            success: true,
+            id: razorpayOrder.id,
+            amount: razorpayOrder.amount,
+            currency: razorpayOrder.currency,
+            receipt: razorpayOrder.receipt
+        });
+
+    } catch (error) {
+        console.error('Razorpay order creation error:', error);
+
+        // Enhanced error handling
+        if (error.error && error.error.code === 'BAD_REQUEST_ERROR') {
+            return res.status(400).json({
+                success: false,
+                message: error.error.description || 'Invalid request parameters',
+                error: error.error
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create payment order',
+            error: error.message
+        });
+    }
+};
+
 
 
 
@@ -258,9 +458,11 @@ const orderConfirm = async (req, res) => {
 
 module.exports = {
     checkout,
+    createOrder,
     placeOrderInitial,
     orderConfirm,
     PostCheckOut,
     placeOrder,
+    verifyPayment
 
 }
