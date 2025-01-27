@@ -258,10 +258,23 @@
            </div>
          </form>
        </div>
+       <div class="sorting-section">
+        <form method="GET" action="/shop" id="sorting-form">
+          <label for="sort">Sort by:</label>
+          <select name="sort" id="sort" onchange="document.getElementById('sorting-form').submit()">
+            <option value="">Select</option>
+            <option value="price_asc">Price: Low to High</option>
+            <option value="price_desc">Price: High to Low</option>
+            <option value="name_asc">Name: A to Z</option>
+            <option value="name_desc">Name: Z to A</option>
+          </select>
+        </form>
+      </div>
      </aside>
 
 
      <main class="product-grid">
+      
         <%for(let i=0;i<products.length;i++){%>
          <div class="product-card">
           <div>

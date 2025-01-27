@@ -61,13 +61,15 @@ const EditProfile = async (req, res) => {
 const addAddress = async (req, res) => {
     try {
         const user = req.session.user;
-        res.render("add-address", { user: user })
+        const userData=await User.findById(user)
+        res.render("add-address", { user: userData })
     } catch (error) {
         res.redirect("/pageNotFound")
     }
 }
 
 const postAddAddress = async (req, res) => {
+
     try {
         const userId = req.session.user;
         const userData = await User.findOne({ _id: userId })
@@ -116,11 +118,10 @@ const editAddress = async (req, res) => {
         const user = req.session.user;
         // console.log("addressId",addressId);
 
-
         const currentAddress = await Address.findOne({
             userId: user,
         })
-        // console.log("currentAddress",currentAddress);
+       
 
         if (!currentAddress) {
             return res.redirect("/paggeNotFound")
@@ -128,12 +129,17 @@ const editAddress = async (req, res) => {
         const addressData = currentAddress.address.find((item) => {
             return item._id.toString() === addressId.toString()
         })
-        // console.log("addressData",addressData);
+        
 
         if (!addressData) {
             return res.redirect("/pageNotFound")
         }
-        res.render("edit-address", { address: addressData, user: user })
+ 
+         
+        const userData=await User.findById(user)
+        console.log(userData);
+        
+        res.render("edit-address", { address: addressData, user: userData })
 
     } catch (error) {
         console.error("Error in edit address", error)
@@ -168,7 +174,7 @@ const postEditAddress = async (req, res) => {
                 }
             }
         )
-        res.redirect("userProfile/#address")
+        res.redirect("/userProfile")
 
     } catch (error) {
         console.log("Error for edit address", error);

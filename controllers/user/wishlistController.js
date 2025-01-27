@@ -9,6 +9,7 @@ const getWishlist = async (req, res) => {
         if (!user) {
             res.redirect("/login")
         }
+        const userData=await  User.findById(user)
         const wishlist = await Wishlist.findOne({ userId: user }).populate('products.productId')
         if (!wishlist || wishlist.products.length < 0) {
             return res.render('wishlist', { wishlistItems: [] })
@@ -22,8 +23,8 @@ const getWishlist = async (req, res) => {
             image: item.productId.productImage[0],
             stockStatus: item.productId.quantity > 0,
         }));
-
-        res.render('wishlist', { wishlistItems, user: user })
+       
+        res.render('wishlist', { wishlistItems, user: userData })
     } catch (error) {
         console.error('Error fetching wishlist:', error);
         res.status(500).send('Internal server error');

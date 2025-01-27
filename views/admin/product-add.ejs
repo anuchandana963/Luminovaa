@@ -66,7 +66,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Quantity</label>
-                                        <input placeholder="" name="quantity" type="text" class="form-control border">
+                                        <input placeholder="" name="quantity" id="quantity" type="text" class="form-control border">
                                         <div id="quantity-error" class="error-message"></div>
                                     </div>
                                 </div>
@@ -318,7 +318,7 @@
             const color = document.getElementsByName('color')[0].value;
             const category = document.getElementsByName('category')[0].value;
             const images = document.getElementById('input1')
-            const quantity = document.getElementsByName('quantity')
+            const quantity = document.getElementById('quantity').value
             let isValid = true
             if (name.trim() === "") {
                 displayErrorMessage('productName-error', 'Please enter a product name.');

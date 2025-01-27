@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -12,7 +13,8 @@
             box-sizing: border-box;
         }
 
-        body, html {
+        body,
+        html {
             height: 100%;
             display: flex;
             justify-content: center;
@@ -97,30 +99,20 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <h2 class="text-center">Admin Login</h2>
         <form id="adminLoginForm" method="post" action="/admin/login">
             <div class="form-group">
                 <label for="adminEmail">Email address</label>
-                <input
-                    type="email"
-                    class="form-control"
-                    id="adminEmail"
-                    name="email"
-                    placeholder="Enter your email"
-                />
+                <input type="email" class="form-control" id="adminEmail" name="email" placeholder="Enter your email" />
                 <div id="emailError" class="error-message"></div>
             </div>
             <div class="form-group">
                 <label for="adminPassword">Password</label>
-                <input
-                    type="password"
-                    class="form-control"
-                    id="adminPassword"
-                    name="password"
-                    placeholder="Enter your password"
-                />
+                <input type="password" class="form-control" id="adminPassword" name="password"
+                    placeholder="Enter your password" />
                 <div id="passwordError" class="error-message"></div>
             </div>
             <button type="submit" id="login" class="btn">Login</button>
@@ -138,7 +130,7 @@
             adminLoginForm.addEventListener("submit", function (event) {
                 let isValid = true;
                 const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-                
+
                 if (!emailPattern.test(emailField.value)) {
                     emailError.textContent = "Please enter a valid email address";
                     isValid = false;
@@ -160,4 +152,5 @@
         });
     </script>
 </body>
+
 </html>

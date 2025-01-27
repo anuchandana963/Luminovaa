@@ -26,14 +26,14 @@ const login =async(req,res)=>{
                 req.session.admin=true;
                 return res.redirect("/admin/dashboard")
             }else{
-                return res.redirect('/login')
+                return res.redirect('/admin/login')
             }
         }else{
-            return res.redirect('/login')
+            return res.redirect('/admin/login')
         }
     } catch (error) {
         console.log("login error",error);
-        return res.redirect('/pageerror')
+        return res.redirect('/admin/pageerror')
         
     }
 }

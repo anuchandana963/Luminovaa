@@ -10,17 +10,15 @@ const razorpay = new Razorpay({
 
 const loadWallet = async (req, res) => {
     try {
-        const userId = req.session.user; // Logged-in user ID
+        const userId = req.session.user; 
         if (!userId) {
             return res.redirect('/login');
         }
 
-        // Pagination setup
-        const page = parseInt(req.query.page) || 1; // Current page (default is 1)
-        const limit = parseInt(req.query.limit) || 5; // Number of transactions per page
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5; 
         const skip = (page - 1) * limit;
 
-        // Fetch wallet details
         const wallet = await Wallet.findOne({ userId }).sort({createdOn:1}).populate('transactions.orderId').lean();
 
         if (!wallet) {
@@ -35,16 +33,15 @@ const loadWallet = async (req, res) => {
             });
         }
 
-        // Pagination logic
-        const totalTransactions = wallet.transactions.length; // Total transactions
+        const totalTransactions = wallet.transactions.length; 
         const paginatedTransactions = wallet.transactions
             .slice()
             .reverse()
-            .slice(skip, skip + limit); // Apply skip and limit
+            .slice(skip, skip + limit); 
 
-        const totalPages = Math.ceil(totalTransactions / limit); // Total pages
+        const totalPages = Math.ceil(totalTransactions / limit); 
 
-        // Render the wallet page with paginated data
+    
         res.render('wallet', {
             balance: wallet.balance || 0,
             transactions: paginatedTransactions,
@@ -63,7 +60,7 @@ const loadWallet = async (req, res) => {
 
 const createWallet = async (req, res) => {
     try {
-        const amount = req.body.amount * 100;  // Convert to paise
+        const amount = req.body.amount * 100;  
         const options = {
             amount: amount,
             currency: "INR",
@@ -78,8 +75,8 @@ const createWallet = async (req, res) => {
             }
             
         console.log('    16');
-            // Save the amount to session or pass it to the front end
-            req.session.amount = amount;  // Store amount in session (you can use other ways to store it)
+           
+            req.session.amount = amount;  
             
         console.log('    15');
             res.json({ orderId: order.id, amount: order.amount });
@@ -94,22 +91,15 @@ const createWallet = async (req, res) => {
 const verifyWallet = async (req, res) => {
     try {
         const { paymentId, orderId, signature } = req.body;
-        console.log('Step 1: Extracted payment details');
         
         const userId = req.session.user;
-        const amount = req.session.amount/100;  // Retrieve the stored amount
-        console.log('Step 2: Retrieved user session data');
-
-        // Generate the HMAC signature for verification
+        const amount = req.session.amount/100;  
+         
         const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
         hmac.update(orderId + "|" + paymentId);
         const generatedSignature = hmac.digest('hex');
-        console.log('Step 3: Generated HMAC signature');
-
+       
         if (generatedSignature === signature) {
-            console.log('Step 4: Signature verified successfully');
-
-            // Prepare the transaction object
             const transaction = {
                 type: 'Deposit',
                 amount: amount,
@@ -117,29 +107,28 @@ const verifyWallet = async (req, res) => {
                 date: new Date()
             };
 
-            // Update wallet balance and transactions
+
             Wallet.findOneAndUpdate(
                 { userId },
                 {
-                    $inc: { balance: amount }, // Increment the balance
-                    $push: { transactions: transaction } // Add transaction to array
+                    $inc: { balance: amount },
+                    $push: { transactions: transaction } 
                 }
             )
                 .then(() => {
-                    req.session.amount = null; // Clear the session amount after success
-                    console.log('Step 5: Wallet updated successfully');
+                    req.session.amount = null; 
                     res.status(200).send({ message: 'Payment successful' });
                 })
                 .catch((err) => {
-                    console.error('Step 6: Error updating wallet:', err);
+                    
                     res.status(500).send({ message: 'Error updating wallet', error: err });
                 });
         } else {
-            console.log('Step 7: Signature verification failed');
+           
             res.status(400).send({ message: 'Payment verification failed' });
         }
     } catch (error) {
-        console.error('Step 8: Unexpected error occurred:', error);
+       
         res.status(500).send({ message: 'Error verifying payment', error: error });
     }
 };

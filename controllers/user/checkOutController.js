@@ -34,7 +34,8 @@ const checkout = async (req, res) => {
         }
 
 
-        const userData= await User.find({user:userId})
+        const userData= await User.findById(userId)
+        console.log("userrrr",userData)
 
         const address = await Address.findOne({ userId})
         const addresses = address ? address.address : [];
@@ -51,7 +52,7 @@ const checkout = async (req, res) => {
             }
 
             totalPrice = product.salePrice;
-            return res.render('checkout', { cart: null, product, address: addresses, totalPrice })
+            return res.render('checkout', { cart: null, product, address: addresses, totalPrice,user: userData })
         } else {
             const cart = await Cart.findOne({ userId }).populate('items.productId');
             if (!cart || cart.items.length === 0) {
@@ -409,8 +410,10 @@ const orderConfirm = async (req, res) => {
     try {
 
         const id = req.query.id
+        const user=req.session.user;
         const order = await Order.findById(id);
-        res.render('successCheckOut', { orderId: order._id })
+        const userData=await User.findById(user)
+        res.render('successCheckOut', { orderId: order._id ,user:userData})
 
     } catch (error) {
         console.error("Error loading cofirmation page", error);
@@ -451,7 +454,45 @@ const orderConfirm = async (req, res) => {
         }
     };
 
-
+    const addAddress = async (req, res) => {
+        try {
+            const user = req.session.user;
+            const userData=await User.findById(user)
+            res.render("checkaddress", { user: userData })
+        } catch (error) {
+            res.redirect("/pageNotFound")
+        }
+    }
+    
+    const postAddAddress = async (req, res) => {
+    
+        try {
+            const userId = req.session.user;
+            const userData = await User.findOne({ _id: userId })
+            const { addressType, name, city, landMark, state, pincode, phone, altPhone } = req.body;
+    
+            const userAddress = await Address.findOne({ userId: userData._id })
+    
+            if (!userAddress) {
+                const newAddress = new Address({
+                    userId: userData._id,
+                    address: [{ addressType, name, city, landMark, state, pincode, phone, altPhone }],
+                })
+                await newAddress.save()
+            } else {
+                userAddress.address.push({ addressType, name, city, landMark, state, pincode, phone, altPhone })
+                await userAddress.save()
+            }
+    
+            res.redirect("/checkOut")
+    
+        } catch (error) {
+            console.error("Got error to adding address:", error);
+            res.redirect("/pageNotFound")
+        }
+    
+    
+    }
 
 
 
@@ -463,6 +504,8 @@ module.exports = {
     orderConfirm,
     PostCheckOut,
     placeOrder,
-    verifyPayment
+    verifyPayment,
+    addAddress,
+    postAddAddress
 
 }

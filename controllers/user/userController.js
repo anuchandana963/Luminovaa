@@ -11,7 +11,11 @@ const req = require("express/lib/request")
 
 const loadSignup = async (req, res) => {
     try {
-        res.render("signup")
+        if(!req.session.user){
+            res.render("signup")
+        }else{
+            res.redirect('/')
+        }
     } catch (error) {
         console.log('Home page not loading:', error)
         res.status(500).send('Server Error')
@@ -44,7 +48,7 @@ const loadHomepage = async (req, res) => {
             isBlocked: false,
             category: { $in: category.map(category => category._id) }, quantity: { $gt: 0 }
         }).sort({ createdAt: -1 })
-        console.log("pd", productData);
+      
 
         // if (req.isAuthenticated()) {
         //     return res.render("home",{user:userId,productData})
@@ -229,8 +233,10 @@ const loadLogin = async (req, res) => {
             if (user && user.isBlocked) {
                 req.session.user = null;
                 return res.render("login", { message: "User is blocked" });
+            }else{
+                return res.redirect("/");
             }
-            return res.redirect("/");
+            
         } else {
             return res.render("login", { message: '' });
         }
@@ -289,6 +295,21 @@ const logout = async (req, res) => {
 const loadShoppingPage = async (req, res) => {
     try {
         const user = req.session.user;
+        const { sort } = req.query;
+
+        let sortOption = {};
+        if (sort === 'price_asc') {
+        sortOption.salePrice = 1; // Ascending
+        } else if (sort === 'price_desc') {
+        sortOption.salePrice = -1; // Descending
+        } else if (sort === 'name_asc') {
+        sortOption.productName = 1; // Alphabetical A-Z
+        } else if (sort === 'name_desc') {
+        sortOption.productName = -1; // Alphabetical Z-A
+        }else{
+            sortOption.createOn=-1;
+        }
+
 
 
         const userData = await User.findOne({ _id: user });
@@ -301,7 +322,7 @@ const loadShoppingPage = async (req, res) => {
             isBlocked: false,
             category: { $in: categoryId },
             quantity: { $gt: 0 },
-        }).sort({ createOn: -1 }).skip(skip).limit(limit);
+        }).sort(sortOption).skip(skip).limit(limit);
 
         const totalProducts = await Product.countDocuments({
             isBlocked: false,
@@ -449,7 +470,8 @@ const searchProducts = async (req, res) => {
                 category: { $in: categoryIds }
             })
         }
-        searchResult.sort((a, b) => new Date(b.createOn) - new Date(a.createOn))
+        // console.log("searchResult",searchResult)
+        searchResult.sort((a,b) => new Date(b.createOn) - new Date(a.createOn))
         let itemsPerPage = 6;
         let currentPage = parseInt(req.query.page) || 1;
         let startIndex = (currentPage - 1) * itemsPerPage;

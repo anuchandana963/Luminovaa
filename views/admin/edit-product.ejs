@@ -68,7 +68,7 @@
 
                     <div class="card-body">
                         <form method="post" action="/admin/editProduct/<%=product._id%>" enctype="multipart/form-data"
-                            onsubmit="return validateForm()">
+                            >
                             <div class="mb-4">
                                 <label for="product_name" class="form-label">Product Name</label>
                                 <input type="text" name="productName" value="<%=product.productName%>"
@@ -102,7 +102,7 @@
                                 <div class="col-lg-4">
                                     <div class="mb-4">
                                         <label class="form-label">Quantity</label>
-                                        <input name="quantity" type="text" value="<%=product.quantity%>"
+                                        <input name="quantity" id="quantity" type="text" value="<%=product.quantity%>"
                                             class="form-control border">
                                         <div id="quantity-error" class="error-message"></div>
                                     </div>
@@ -231,7 +231,7 @@
                             <div>
 
 
-                                <button class="btn btn-md rounded font-sm hover-up" id="updatebtn" type="submit"
+                                <button class="btn btn-md rounded font-sm hover-up" id="updatebtn" type="submit" onclick="return validateForm()"
                                     >Update</button>
                             </div>
                         </form>
@@ -252,6 +252,7 @@
 
 
             function validateForm() {
+
                 let imageDatas = false
                 console.log("validate form");
                 clearErrorMessages();
@@ -263,7 +264,7 @@
                 const color = document.getElementsByName('color')[0].value;
                 const category = document.getElementsByName('category')[0].value;
                 const images = document.getElementById('input1')
-                const quantity = document.getElementsByName('quantity')
+                const quantity = document.getElementById('quantity').value
                 imageDatas = document.getElementById("imageDatas")?.value;
                 let isValid = true;
                 if (name.trim() === "") {
@@ -277,7 +278,7 @@
                 }
 
 
-                if (parseInt(quantity) < 0) {
+                if (parseInt(quantity) < 0||quantity.trim()=='') {
                     displayErrorMessage('quantity-error', 'Please enter a valid non-negative quantity.');
                     isValid = false;
                 }

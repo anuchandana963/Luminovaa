@@ -20,8 +20,8 @@ const getOrders = async (req, res) => {
         }
 
         const orders = await Order.find({ user }).sort({ createdOn: -1 })
-        
-        res.render("orderList", { orders })
+        const userData=await User.findById(user)
+        res.render("orderList", { orders,user: userData})
 
 
     } catch (error) {
@@ -45,7 +45,7 @@ const getOrderDetails = async (req, res) => {
             })
         );
       
-
+       console.log("address",address)
         res.render('viewOrderDetails', { order, products, address: address.address[0], user })
 
     } catch (error) {

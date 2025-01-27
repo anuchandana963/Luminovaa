@@ -72,6 +72,11 @@ router.post("/edit-profile", userAuth, profileController.EditProfile)
 router.get("getAddress",userAuth,profileController.getAddress)
 router.get("/addAddress", userAuth, profileController.addAddress)
 
+
+router.get("/addcheckAddress", userAuth, checkOutControllers.addAddress)
+router.post("/postaddAddres", userAuth, checkOutControllers.postAddAddress)
+
+
 router.post("/postAddAddress", userAuth, profileController.postAddAddress)
 //edit
 router.get("/editAddress", userAuth, profileController.editAddress)
