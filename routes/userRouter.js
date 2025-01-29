@@ -117,6 +117,7 @@ router.get('/orders', userAuth, ordersController.getOrders)
 router.get('/order-details', userAuth, ordersController.getOrderDetails)
 router.get('/cancel-order', userAuth, ordersController.getOrderCancel)
 router.post("/return-request",userAuth,ordersController.returnRequest)
+router.get("/download-Invoice",userAuth,ordersController.downloadInvoice)
 
 //coupon
 router.get('/coupons', userAuth, ordersController.getCoupons)

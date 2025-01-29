@@ -20,6 +20,9 @@ router.get('/dashboard',adminAuth,adminController.loadDashboad)
 router.get('/logout',adminController.logout)
 
 
+router.get("/dashboad",adminAuth,adminController.loadDashboad)
+
+
 //Customers
 router.get('/customers',adminAuth,customerController.customerInfo)
 router.get("/blockCustomer",adminAuth,customerController.customerBlocked)

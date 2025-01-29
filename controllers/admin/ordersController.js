@@ -140,7 +140,7 @@ const returnRequest = async (req, res) => {
                             }
                         }
                     },
-                    {new: true} // Return updated document
+                    {new: true} 
                 );
                 
                 // if (!walletUpdate) {
