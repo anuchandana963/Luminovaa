@@ -119,6 +119,10 @@ router.get('/cancel-order', userAuth, ordersController.getOrderCancel)
 router.post("/return-request",userAuth,ordersController.returnRequest)
 router.get("/download-Invoice",userAuth,ordersController.downloadInvoice)
 
+router.post('/retry-payment',checkOutControllers.retryPayment)
+router.get('/payment-failed',userAuth,checkOutControllers.paymentFailed);
+
+
 //coupon
 router.get('/coupons', userAuth, ordersController.getCoupons)
 router.post("/apply-coupon", userAuth, ordersController.applyCoupon)

@@ -44,19 +44,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <main class="main">
-        <!-- Order Details Section -->
         <section class="order-details-section position-relative pt-50">
             <div class="container">
-                <!-- Return to Orders Link -->
                 <div class="return-link mb-4">
                     <a href="/orders" class="text-muted"><i class="fi-rs-angle-left"></i> Return to Orders</a>
                 </div>
 
-                <!-- Store and Order Summary -->
-                <!-- Store and Order Summary -->
                 <div class="store-order-summary d-flex justify-content-between align-items-center mb-4">
                     <div>
-                        <!-- <h2 class="store-name">Digitalage</h2> -->
+        
                         <p>Order ID: <%= order.orderId %> <br>Payment Status:
                                 <span class="badge text-dark ms-2 
                 <% if (order.paymentStatus === 'Pending') { %> bg-secondary 
@@ -64,7 +60,7 @@
                 <% } else if (order.paymentStatus === 'Completed') { %> bg-success 
                 <% } else if (order.paymentStatus === 'Failed') { %> bg-dander 
                 <% } %>">
-                                    <%= order.paymentStatus %>
+                                <%= order.paymentStatus %>
                                 </span>&nbsp;&nbsp;&nbsp;
                                 <% if (order.paymentStatus==='Pending' && order.paymentMethod==='Online' ) { %>
                                     <button id="continuePaymentButton" class="btn btn-primary"
@@ -175,7 +171,7 @@
                     const response = await fetch('/retry-payment', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ orderId })
+                        body: JSON.stringify({ orderId }) 
                     });
 
                     const data = await response.json();

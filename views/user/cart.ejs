@@ -204,7 +204,7 @@ a.text-muted:hover {
                                         <% } %>
                                         <tr>
                                             <td colspan="6" class="text-end">
-                                                <a href="/clearCart" class="text-muted">
+                                                <a href="#" onclick="clearCart()" class="text-muted">
                                                     <i class="fi-rs-cross-small"></i> Clear Cart
                                                 </a>
                                             </td>
@@ -300,6 +300,43 @@ a.text-muted:hover {
                     }
                 });
             }
+
+
+            function clearCart() {
+    Swal.fire({
+        title: 'Clear entire cart?',
+        text: "This will remove all items from your cart!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, clear it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+           
+            fetch('/clearCart', {
+                method: 'GET',
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                }
+            })
+            .catch(error => {
+                console.error("Error clearing cart:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Something went wrong while clearing your cart. Please try again.'
+                });
+            });
+        }
+    });
+}
+
+
+
 
             function updateQuantity(productId, change, availableQuantity) {
                 const quantityElement = document.getElementById(`quantity-${productId}`);

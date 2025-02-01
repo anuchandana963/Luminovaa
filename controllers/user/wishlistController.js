@@ -35,6 +35,9 @@ const getWishlist = async (req, res) => {
 const addToWishlist = async (req, res) => {
     try {
         const userId = req.session.user;
+        if(!userId){
+           res.redirct("/login")
+        }
         const productId = req.body.productId;
         if (!userId && !productId) {
             console.log('userId or productId is missing');
