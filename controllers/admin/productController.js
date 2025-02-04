@@ -96,7 +96,7 @@ const getAllProducts = async (req, res) => {
 
         const category = await Category.find({ isListed: true })
 
-        if(category) {
+        if (category) {
             res.render("products", {
                 data: productData,
                 currentPage: page,
@@ -163,8 +163,8 @@ const editProduct = async (req, res) => {
 
         const product = await Product.findOne({ _id: id });
         const data = req.body;
-        console.log("data",data);
-        
+        console.log("data", data);
+
         const existingProduct = await Product.findOne({
             productName: data.productName,
             _id: { $ne: id }
@@ -173,15 +173,15 @@ const editProduct = async (req, res) => {
         if (existingProduct) {
             return res.status(400).json({ error: "Product with name already exists.Please try with another name" })
         }
-        
 
-        const category = await Category.findOne({name:data.category})
+
+        const category = await Category.findOne({ name: data.category })
         console.log('imagess');
-        
+
         const images = [];
         if (req.files && req.files.length > 0) {
             console.log(req.files);
-            
+
             for (let i = 0; i < req.files.length; i++) {
                 images.push(req.files[i].filename);
             }
@@ -215,8 +215,8 @@ const deleteSingleImage = async (req, res) => {
     try {
         const { imageNameToServer, productIdToServer } = req.body;
         console.log("Request body:", req.body);
-        const product = await Product.findByIdAndUpdate(productIdToServer, { 
-            $pull: { productImage: imageNameToServer } 
+        const product = await Product.findByIdAndUpdate(productIdToServer, {
+            $pull: { productImage: imageNameToServer }
         });
 
         if (!product) {
@@ -243,17 +243,17 @@ const deleteSingleImage = async (req, res) => {
 
 
 
-const addProductOffer=async (req,res)=>{
+const addProductOffer = async (req, res) => {
     try {
-        const {percentage,productId}=req.body;
-        const findProduct=await Product.findOne({_id:productId})
-        const findCategory=await Category.findOne({_id:findProduct.category})
+        const { percentage, productId } = req.body;
+        const findProduct = await Product.findOne({ _id: productId })
+        const findCategory = await Category.findOne({ _id: findProduct.category })
 
-        if(percentage>99){
-            return res.json({status:false,message:"Offer percentage should be less than 100."})
+        if (percentage > 99) {
+            return res.json({ status: false, message: "Offer percentage should be less than 100." })
         }
 
-        if(findCategory.categoryOffer>percentage){
+        if (findCategory.categoryOffer > percentage) {
             return res.json({ status: false, message: "This product's category already has a category offer." });
         }
         const discount = Math.floor(findProduct.salePrice * (percentage / 100));
@@ -274,16 +274,16 @@ const addProductOffer=async (req,res)=>{
 }
 
 
-const removeProductOffer=async (req,res)=>{
+const removeProductOffer = async (req, res) => {
     try {
-        const {productId}=req.body;
-        let findProduct=await Product.findOne({_id:productId})
+        const { productId } = req.body;
+        let findProduct = await Product.findOne({ _id: productId })
         const percentage = findProduct.productOffer;
-        findProduct.salePrice=((findProduct.salePrice*100)/(100-percentage))
-        findProduct.productOffer=0;
+        findProduct.salePrice = ((findProduct.salePrice * 100) / (100 - percentage))
+        findProduct.productOffer = 0;
         await findProduct.save()
 
-         res.json({ status: true });
+        res.json({ status: true });
     } catch (error) {
         console.error(error);
         res.redirect('/admin/pageerror');

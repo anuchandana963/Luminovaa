@@ -196,7 +196,6 @@ const createOrder = async (req, res) => {
             });
         }
 
-        // Generate unique receipt ID
         const receipt = crypto
             .randomBytes(16)
             .toString('hex');
@@ -219,7 +218,6 @@ const createOrder = async (req, res) => {
         console.log(razorpayOrder+'razorpayOrder');
         
 
-        // Store order ID in session with expiry
         req.session.razorpayOrderId = razorpayOrder.id;
         console.log(req.session.razorpayOrderId+'eq.session.razorpayOrderId');
 
@@ -236,7 +234,7 @@ const createOrder = async (req, res) => {
     } catch (error) {
         console.error('Razorpay order creation error:', error);
 
-        // Enhanced error handling
+  
         if (error.error && error.error.code === 'BAD_REQUEST_ERROR') {
             return res.status(400).json({
                 success: false,
@@ -492,17 +490,18 @@ const orderConfirm = async (req, res) => {
         }
     
     
-    }
+    }  
 
 
 
     
     const paymentFailed = async (req, res) => {
         try {
-    
+            const user=req.session.user;
+            const userData=await User.findById(user)
             const { errorReference, message } = req.query;
             const orderId = req.query.id;
-            res.render('payment-failed', { errorReference, message, orderId });
+            res.render('payment-failed', {user:userData, errorReference, message, orderId });
     
         } catch (error) {
     

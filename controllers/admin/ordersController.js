@@ -1,7 +1,7 @@
 
-const User=require('../../models/userSchema')
-const Order =require('../../models/orderSchema')
-const Product =require('../../models/productSchema')
+const User = require('../../models/userSchema')
+const Order = require('../../models/orderSchema')
+const Product = require('../../models/productSchema')
 const Address = require('../../models/addressSchema')
 const PDFDocument = require('pdfkit');
 const Return = require('../../models/returnSchema')
@@ -9,17 +9,17 @@ const Wallet = require('../../models/walletSchema')
 const ExcelJS = require('exceljs');
 
 
-const getAllorders=async (req,res)=>{
+const getAllorders = async (req, res) => {
     try {
-        const limit=5;
-        const page=Math.max(1,parseInt(req.query.page)||1)
-        const orders=(await Order.find().sort({createdOn:-1}).populate('user').populate('orderedItems.product').limit(limit).skip((page-1)*limit));
-        const count=await Order.countDocuments()
-        res.render('orders',{orders,totalPages:Math.ceil(count/limit),currentPage:page})
+        const limit = 5;
+        const page = Math.max(1, parseInt(req.query.page) || 1)
+        const orders = (await Order.find().sort({ createdOn: -1 }).populate('user').populate('orderedItems.product').limit(limit).skip((page - 1) * limit));
+        const count = await Order.countDocuments()
+        res.render('orders', { orders, totalPages: Math.ceil(count / limit), currentPage: page })
     } catch (error) {
         console.error(error);
         res.redirect('admin/pageerror')
-        
+
     }
 }
 const updateOrderStatus = async (req, res) => {
@@ -32,9 +32,9 @@ const updateOrderStatus = async (req, res) => {
         }
 
         order.status = newStatus;
-        if(order.paymentMethod=='COD' && newStatus=='Delivered'){
-            order.paymentStatus='Completed'
-        } 
+        if (order.paymentMethod == 'COD' && newStatus == 'Delivered') {
+            order.paymentStatus = 'Completed'
+        }
         await order.save();
 
         res.json({ success: true, message: 'Order status updated' });
@@ -46,29 +46,29 @@ const updateOrderStatus = async (req, res) => {
 
 
 
-const getSaleReport=async (req,res)=>{
+const getSaleReport = async (req, res) => {
     try {
-        const {page=1,limit=10,startDate,endDate}=req.query;
-        const filter={};
+        const { page = 1, limit = 10, startDate, endDate } = req.query;
+        const filter = {};
 
-        if(startDate||endDate){
-            filter.createdOn={};
-            if(startDate)filter.createdOn.$gte=new Date(startDate);
-            if(endDate)filter.createsOn.$lte=new Date(endDate)
+        if (startDate || endDate) {
+            filter.createdOn = {};
+            if (startDate) filter.createdOn.$gte = new Date(startDate);
+            if (endDate) filter.createsOn.$lte = new Date(endDate)
         }
 
-        const orders=await Order.find(filter).populate('user').populate('orderedItems.product').sort({createdOn:-1}).skip((page-1)*limit).limit(parseInt(limit))
-        
-        const totalSales= await Order.aggregate([{$match:filter},{$group:{_id:null,total:{$sum:'$finalAmount'}}}]);
-        const totalDiscount=await Order.aggregate([{$match:filter},{$group:{_id:null,total:{$sum:'$discount'}}}]);
-        const uniqueCustomers=await Order.distinct('user',filter);
-        const totalOrders=await Order.countDocuments(filter);
-        
+        const orders = await Order.find(filter).populate('user').populate('orderedItems.product').sort({ createdOn: -1 }).skip((page - 1) * limit).limit(parseInt(limit))
 
-        res.render('salesReport',{
+        const totalSales = await Order.aggregate([{ $match: filter }, { $group: { _id: null, total: { $sum: '$finalAmount' } } }]);
+        const totalDiscount = await Order.aggregate([{ $match: filter }, { $group: { _id: null, total: { $sum: '$discount' } } }]);
+        const uniqueCustomers = await Order.distinct('user', filter);
+        const totalOrders = await Order.countDocuments(filter);
+
+
+        res.render('salesReport', {
             orders,
-            totalSales:totalSales[0]?.total||0,
-            totalDiscount:totalDiscount[0]?.total || 0,
+            totalSales: totalSales[0]?.total || 0,
+            totalDiscount: totalDiscount[0]?.total || 0,
             uniqueCustomers: uniqueCustomers.length,
             count: totalOrders,
             currentPage: parseInt(page),
@@ -85,17 +85,18 @@ const getSaleReport=async (req,res)=>{
     }
 }
 
-const  getReturnPage= async (req,res)=>{
+const getReturnPage = async (req, res) => {
     try {
-        const limit =5;
-        
-        const page= Math.max(1,parseInt(req.query.page))||0
-        const skip= (page-1)/limit
-        const returnData=await Return.find().populate('userId').populate('orderId').sort({createdAt:-1}).limit(limit).skip(skip);
+        const limit = 5;
+
+        const page = Math.max(1, parseInt(req.query.page)) || 0
+        const skip = (page - 1) / limit
+        const returnData = await Return.find().populate('userId').populate('orderId').sort({ createdAt: -1 }).limit(limit).skip(skip);
 
         console.log(returnData);
-        const count =await Return.countDocuments();
-        res.render('returnOrder',{returns:returnData,
+        const count = await Return.countDocuments();
+        res.render('returnOrder', {
+            returns: returnData,
             totalPages: Math.ceil(count / limit),
             currentPage: page
         })
@@ -116,7 +117,7 @@ const returnRequest = async (req, res) => {
 
         const returnData = await Return.findById(returnId);
         if (!returnData) {
-            return res.json({message: 'return id not found'});
+            return res.json({ message: 'return id not found' });
         }
 
         console.log('Return Data:', returnData);
@@ -128,9 +129,9 @@ const returnRequest = async (req, res) => {
         if (status === 'approved') {
             try {
                 const walletUpdate = await Wallet.findOneAndUpdate(
-                    {userId},
+                    { userId },
                     {
-                        $inc: {balance: amount},
+                        $inc: { balance: amount },
                         $push: {
                             transactions: {
                                 type: 'Refund',
@@ -140,25 +141,25 @@ const returnRequest = async (req, res) => {
                             }
                         }
                     },
-                    {new: true} 
+                    { new: true }
                 );
-                
+
                 // if (!walletUpdate) {
                 //     console.log('Wallet not found for user:', userId);
                 //     return res.status(404).json({message: 'Wallet not found'});
-                // }
+                // } 
 
                 returnData.returnStatus = 'approved';
                 await returnData.save();
-                await Order.findByIdAndUpdate(orderId, {$set: {status: 'Returned'}});
-                
+                await Order.findByIdAndUpdate(orderId, { $set: { status: 'Returned' } });
+
             } catch (walletError) {
                 console.error('Wallet update error:', walletError);
-                return res.status(500).json({message: 'Error updating wallet'});
+                return res.status(500).json({ message: 'Error updating wallet' });
             }
         }
-      
-        
+
+
         res.redirect('/admin/getReturnRequest');
 
     } catch (error) {
@@ -183,7 +184,7 @@ const pdfGenerate = async (req, res) => {
         const orders = await Order.find(filter)
             .populate('user')
             .populate('orderedItems.product');
-        
+
         if (orders.length === 0) {
             return res.status(404).send('No orders found for the given period.');
         }
@@ -199,12 +200,12 @@ const pdfGenerate = async (req, res) => {
 
         doc.pipe(res);
 
-       
+
         doc.fontSize(20).font('Helvetica-Bold')
             .text('Sales Report', { align: 'center', underline: true })
             .moveDown(1);
 
-       
+
         doc.fontSize(12).font('Helvetica-Bold')
             .text('Sales Summary', { underline: true })
             .font('Helvetica')
@@ -218,20 +219,20 @@ const pdfGenerate = async (req, res) => {
             .text(`Total Customers: ${totalCustomers}`)
             .moveDown(1);
 
-        
+
         const headers = ['Sl No', 'User Name', 'Products', 'Quantity', 'Date', 'Discount', 'Final Amount'];
         const columnWidths = [30, 80, 120, 50, 60, 60, 70];
-        const ROW_HEIGHT = 50; 
+        const ROW_HEIGHT = 50;
         const tableTop = doc.y;
 
         doc.font('Helvetica-Bold').fontSize(10);
         doc.lineWidth(0.5);
 
-      
+
         doc.fillColor('#E0E0E0').rect(30, tableTop, 540, ROW_HEIGHT).fill();
         doc.fillColor('black');
 
-       
+
         let xPos = 30;
         headers.forEach((header, i) => {
             doc.text(header, xPos, tableTop + 10, {
@@ -241,84 +242,84 @@ const pdfGenerate = async (req, res) => {
             xPos += columnWidths[i];
         });
 
-    
+
         doc.moveTo(30, tableTop + ROW_HEIGHT)
             .lineTo(570, tableTop + ROW_HEIGHT)
             .stroke();
 
-      
+
         doc.font('Helvetica').fontSize(9);
         let currentY = tableTop + ROW_HEIGHT;
 
         orders.forEach((order, index) => {
-        
+
             if (currentY > doc.page.height - 100) {
                 doc.addPage();
                 currentY = 30;
             }
 
-        
-            const rowColor = index % 2 === 0 ? '#FFFFFF' : '#F5F5F5'; 
+
+            const rowColor = index % 2 === 0 ? '#FFFFFF' : '#F5F5F5';
             const rowY = currentY;
 
-       
+
             doc.fillColor(rowColor)
                 .rect(30, rowY, 540, ROW_HEIGHT)
                 .fill();
 
-    
+
             doc.fillColor('black');
 
-    
+
             const totalQuantity = order.orderedItems.reduce((sum, item) => sum + item.quantity, 0);
 
             const productDetails = order.orderedItems
                 .map(item => `${item.product.productName} (x${item.quantity})`)
                 .join(', ');
 
-        
+
             xPos = 30;
 
-            
-            doc.text(`${index + 1}`, xPos, rowY + 10, { 
-                width: columnWidths[0], 
-                align: 'center' 
+
+            doc.text(`${index + 1}`, xPos, rowY + 10, {
+                width: columnWidths[0],
+                align: 'center'
             });
             xPos += columnWidths[0];
 
-            doc.text(order.user.name, xPos, rowY + 10, { 
-                width: columnWidths[1], 
-                align: 'center' 
+            doc.text(order.user.name, xPos, rowY + 10, {
+                width: columnWidths[1],
+                align: 'center'
             });
             xPos += columnWidths[1];
 
-            doc.text(productDetails, xPos, rowY + 10, { 
-                width: columnWidths[2], 
-                align: 'left' 
+            doc.text(productDetails, xPos, rowY + 10, {
+                width: columnWidths[2],
+                align: 'left'
             });
             xPos += columnWidths[2];
 
-            doc.text(totalQuantity.toString(), xPos, rowY + 10, { 
-                width: columnWidths[3], 
-                align: 'center' 
+            doc.text(totalQuantity.toString(), xPos, rowY + 10, {
+                width: columnWidths[3],
+                align: 'center'
             });
             xPos += columnWidths[3];
 
-            doc.text(new Date(order.createdOn).toLocaleDateString(), xPos, rowY + 10, { 
-                width: columnWidths[4], 
-                align: 'center' 
+            doc.text(new Date(order.createdOn).toLocaleDateString(), xPos, rowY + 10, {
+                width: columnWidths[4],
+                align: 'center'
             });
             xPos += columnWidths[4];
 
-            doc.text(`Rs. ${order.discount.toFixed(2)}`, xPos, rowY + 10, { 
-                width: columnWidths[5], 
-                align: 'center' 
+            doc.text(`Rs. ${order.discount.toFixed(2)}`, xPos, rowY + 10, {
+                width: columnWidths[5],
+                align: 'center'
             });
             xPos += columnWidths[5];
 
-            doc.text(`Rs. ${order.finalAmount.toFixed(2)}`, xPos, rowY + 10, { 
-                width: columnWidths[6], 
-                align: 'center' 
+            doc.text(`Rs. ${order.finalAmount.toFixed(2)}`, xPos, rowY + 10, {
+                width: columnWidths[6],
+                align: 'center'
             });
 
             currentY += ROW_HEIGHT;
@@ -334,70 +335,70 @@ const pdfGenerate = async (req, res) => {
 
 
 
-const excelGenerate=async (req, res) => {
+const excelGenerate = async (req, res) => {
     try {
-        const {start,end}=req.query;
-        console.log(req.query||'nott');
-        const filter={};
-        if(start||end){
-            filter.createdOn={};
-            if(start)filter.createdOn.$gte=new Date(start);
-            if(end)filter.createdOn.$lte=new Date(end)
+        const { start, end } = req.query;
+        console.log(req.query || 'nott');
+        const filter = {};
+        if (start || end) {
+            filter.createdOn = {};
+            if (start) filter.createdOn.$gte = new Date(start);
+            if (end) filter.createdOn.$lte = new Date(end)
         }
-        const orders=await Order.find(filter).populate('user').populate('orderedItems.product','productName').exec();
+        const orders = await Order.find(filter).populate('user').populate('orderedItems.product', 'productName').exec();
         const totalSales = orders.reduce((sum, order) => sum + order.finalAmount, 0);
         const totalOrders = orders.length;
         const totalDiscount = orders.reduce((sum, order) => sum + order.discount, 0);
         const totalCustomers = new Set(orders.map(order => order.user.name)).size;
 
-       
+
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet('Sheet 1');
-    
-      
-        
-       
+
+
+
+
         worksheet.columns = [
             { header: 'Sl No', key: 'Sno', width: 5 },
             { header: 'User Name', key: 'name', width: 15 },
-            { header: 'Products', key: 'Product', width: 50},
+            { header: 'Products', key: 'Product', width: 50 },
             { header: 'Quantity', key: 'Quantity', width: 5 },
             { header: 'Date', key: 'Date', width: 15, style: { alignment: { horizontal: 'center' } } }, // Date column
             { header: 'Discount Amount', key: 'Discount', width: 10, style: { numFmt: '#,##0.00' } }, // Format number
             { header: 'Final Amount', key: 'Final', width: 10, style: { numFmt: '#,##0.00' } }, // Format number
         ];
-    
-       
-        for(let i=0;i<orders.length;i++){ 
-            console.log(orders[i].orderedItems[0].product.productName||'prod');
+
+
+        for (let i = 0; i < orders.length; i++) {
+            console.log(orders[i].orderedItems[0].product.productName || 'prod');
             const productDetails = orders[i].orderedItems
-                    .map((product) => `${product.product.productName} (x${product.quantity})`)
-                    .join(', ');
-            worksheet.addRow({ Sno: i+1, name: orders[i].user.name, Product: productDetails,Quantity:orders[i].orderedItems.reduce((sum, product) => sum + product.quantity, 0),Date:orders[i].createdOn,Discount:orders[i].discount,Final:orders[i].finalAmount});
+                .map((product) => `${product.product.productName} (x${product.quantity})`)
+                .join(', ');
+            worksheet.addRow({ Sno: i + 1, name: orders[i].user.name, Product: productDetails, Quantity: orders[i].orderedItems.reduce((sum, product) => sum + product.quantity, 0), Date: orders[i].createdOn, Discount: orders[i].discount, Final: orders[i].finalAmount });
         }
-        worksheet.addRow({ Sno: '', name: '', Product: '',Quantity:'',Date:'',Discount:'',Final:''});
-        worksheet.addRow({ Sno: '', name: '', Product: '',Quantity:'',Date:'',Discount:'',Final:''});
-        worksheet.addRow({ Sno: '', name: 'Total Sales', Product: totalSales,Quantity:'',Date:'',Discount:'',Final:''});
-        worksheet.addRow({ Sno: '', name: ' Total Orders', Product: totalOrders,Quantity:'',Date:'',Discount:'',Final:''});
-        worksheet.addRow({ Sno: '', name: 'Total Discount', Product: totalDiscount,Quantity:'',Date:'',Discount:'',Final:''});
-        worksheet.addRow({ Sno: '', name: 'Total Customer', Product: totalCustomers,Quantity:'',Date:'',Discount:'',Final:''});
+        worksheet.addRow({ Sno: '', name: '', Product: '', Quantity: '', Date: '', Discount: '', Final: '' });
+        worksheet.addRow({ Sno: '', name: '', Product: '', Quantity: '', Date: '', Discount: '', Final: '' });
+        worksheet.addRow({ Sno: '', name: 'Total Sales', Product: totalSales, Quantity: '', Date: '', Discount: '', Final: '' });
+        worksheet.addRow({ Sno: '', name: ' Total Orders', Product: totalOrders, Quantity: '', Date: '', Discount: '', Final: '' });
+        worksheet.addRow({ Sno: '', name: 'Total Discount', Product: totalDiscount, Quantity: '', Date: '', Discount: '', Final: '' });
+        worksheet.addRow({ Sno: '', name: 'Total Customer', Product: totalCustomers, Quantity: '', Date: '', Discount: '', Final: '' });
 
 
         res.setHeader('Content-Disposition', 'attachment; filename=generated-file.xlsx');
         res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  
+
         await workbook.xlsx.write(res);
         res.end();
     } catch (error) {
         console.error(error);
-        
+
     }
 }
 
 
 
-const getSaleReportFilter=async (req, res) => {
-    const { dateRange, startDate, endDate ,page=1,limit=10} = req.query;
+const getSaleReportFilter = async (req, res) => {
+    const { dateRange, startDate, endDate, page = 1, limit = 10 } = req.query;
     const filter = {};
 
     if (startDate || endDate) {
@@ -423,9 +424,9 @@ const getSaleReportFilter=async (req, res) => {
         }
     }
 
-   
+
     const skip = (page - 1) * limit;
-    const orders = await Order.find(filter).sort({createdOn:-1})
+    const orders = await Order.find(filter).sort({ createdOn: -1 })
         .populate('user orderedItems.product')
         .skip(skip)
         .limit(parseInt(limit));
@@ -439,27 +440,27 @@ const getSaleReportFilter=async (req, res) => {
 
 
 
-const  getOrderDetail= async (req,res)=>{
+const getOrderDetail = async (req, res) => {
     try {
-        const orderId=req.query.id;
-        const order= await Order.findById(orderId)
-        
-        const user=await User.findById(order.user);
-        
-        
-        const address=await Address.findOne({'address._id':order.address},{'address.$':1})
-        const products=await Promise.all(
-            order.orderedItems.map(async (item)=>{
-                return await Product.findOne({_id:item.product})
+        const orderId = req.query.id;
+        const order = await Order.findById(orderId)
+
+        const user = await User.findById(order.user);
+
+
+        const address = await Address.findOne({ 'address._id': order.address }, { 'address.$': 1 })
+        const products = await Promise.all(
+            order.orderedItems.map(async (item) => {
+                return await Product.findOne({ _id: item.product })
             })
         );
-        res.render('orderDetails',{order,products,address:address.address[0],user})
+        res.render('orderDetails', { order, products, address: address.address[0], user })
 
 
     } catch (error) {
         console.error(error);
         res.redirect('/pageNotFound')
-        
+
     }
 }
 
@@ -470,7 +471,7 @@ const  getOrderDetail= async (req,res)=>{
 
 
 
-module.exports={
+module.exports = {
     getReturnPage,
     getAllorders,
     updateOrderStatus,

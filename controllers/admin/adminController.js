@@ -43,10 +43,7 @@ const login = async (req, res) => {
 
 const loadDashboad = async (req, res) => {
     if (req.session.admin) {
-
-
         try {
-
 
             const salesData = await getTotalSales();
             const products = await getMostSellingProducts();
@@ -89,7 +86,7 @@ async function getTotalSales() {
             {
                 $match: {
                     createdOn: {
-                        $gte: new Date(new Date().getFullYear(), 0, 1) // Start of current year
+                        $gte: new Date(new Date().getFullYear(), 0, 1) 
                     }
                 }
             },

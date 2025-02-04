@@ -168,8 +168,6 @@
                                                             | <%= addr.altPhone %>
                                                                 <% } %>
                                                 </p>
-                          
-
                                             </div>
 
                                         </div>
@@ -260,8 +258,6 @@
                                                                     </td>
                                                                 </tr>
 
-
-
                                     </tbody>
                                 </table>
                             </div>
@@ -332,6 +328,20 @@
                                             </svg>
                                         </label>
                                         <div class="payment-description">Pay securely with Razorpay</div>
+                                    </div>
+
+                                    <div class="payment-option">
+                                        <input type="radio" name="payment_method" id="wallet" value="Wallet">
+                                        <label for="wallet">
+                                            Pay with Wallet
+                                            <svg class="payment-icon" width="24" height="24" viewBox="0 0 24 24"
+                                                fill="none" stroke="currentColor" stroke-width="2"
+                                                stroke-linecap="round" stroke-linejoin="round">
+                                                <rect x="2" y="4" width="20" height="16" rx="2" />
+                                                <line x1="2" y1="10" x2="22" y2="10" />
+                                            </svg>
+                                        </label>
+                                        <div class="payment-description">Pay with your wallet balance</div>
                                     </div>
                                 </div>
 
@@ -543,7 +553,7 @@
                     if (finalPrice > 1000) {
                         return Swal.fire({
                             title: 'Error',
-                            text: "Caash on Delivery is not available for products above ₹ 1,000",
+                            text: "Cash on Delivery is not available for products above ₹ 1,000",
                             icon: 'error',
                             showConfirmButton: true,
                             confirmButtonText: "OK",
@@ -563,12 +573,11 @@
                     console.log(result);
                     if (!result.success) throw new Error(result.message || 'Failed to place COD order.');
 
-                    // Redirect to order confirmation page for COD orders
                     window.location.href = `/order-confirmation?id=${result.orderId}`;
                 } else if (paymentMethod === 'Online') {
                     await processOnlinePayment(formData);
                 } else {
-                    // await processWalletPayment(formData)
+                    await processWalletPayment(formData)
                 }
             } catch (error) {
 
@@ -719,69 +728,69 @@
 
 
 
-async function removeCoupon() {
-    const totalPriceElement = document.getElementById('finalPrice');
-    const discountRow = document.getElementById('discountDisplay');
-    const applyCouponBtn = document.getElementById('applyCouponBtn');
-    const removeCouponBtn = document.getElementById('removeCouponBtn');
-    const couponCodeInput = document.getElementById('couponCode');
+        async function removeCoupon() {
+            const totalPriceElement = document.getElementById('finalPrice');
+            const discountRow = document.getElementById('discountDisplay');
+            const applyCouponBtn = document.getElementById('applyCouponBtn');
+            const removeCouponBtn = document.getElementById('removeCouponBtn');
+            const couponCodeInput = document.getElementById('couponCode');
 
-    try {
-        console.log('Total Price Element:', totalPriceElement);
-        console.log('Price Value:', totalPriceElement.getAttribute('data-original-price'));
+            try {
+                console.log('Total Price Element:', totalPriceElement);
+                console.log('Price Value:', totalPriceElement.getAttribute('data-original-price'));
 
-        if (!totalPriceElement || !discountRow) {
-            Swal.fire({
-                text: "Something went wrong. Please refresh the page and try again.",
-                icon: "error"
-            });
-            return;
-        }
+                if (!totalPriceElement || !discountRow) {
+                    Swal.fire({
+                        text: "Something went wrong. Please refresh the page and try again.",
+                        icon: "error"
+                    });
+                    return;
+                }
 
-        const originalPrice = parseFloat(totalPriceElement.getAttribute('data-original-price') || '0');
-        console.log('Original Price:', originalPrice); 
+                const originalPrice = parseFloat(totalPriceElement.getAttribute('data-original-price') || '0');
+                console.log('Original Price:', originalPrice);
 
-        const response = await fetch('/remove-coupon', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json',
-               
-            },
-            body: JSON.stringify({ totalPrice: originalPrice })
-        });
+                const response = await fetch('/remove-coupon', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
 
-     
-        if (!response.ok) {
-            const errorData = await response.text();
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData}`);
-        }
+                    },
+                    body: JSON.stringify({ totalPrice: originalPrice })
+                });
 
-        const result = await response.json();
-        console.log('Success result:', result); 
 
-        if (result.success) {
-            totalPriceElement.textContent = result.finalTotal.toFixed(2);
-            discountRow.style.display = 'none';
-            if (applyCouponBtn) applyCouponBtn.style.display = 'block';
-            if (removeCouponBtn) removeCouponBtn.style.display = 'none';
-            if (couponCodeInput) {
-                couponCodeInput.value = '';
-                couponCodeInput.disabled = false;
+                if (!response.ok) {
+                    const errorData = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorData}`);
+                }
+
+                const result = await response.json();
+                console.log('Success result:', result);
+
+                if (result.success) {
+                    totalPriceElement.textContent = result.finalTotal.toFixed(2);
+                    discountRow.style.display = 'none';
+                    if (applyCouponBtn) applyCouponBtn.style.display = 'block';
+                    if (removeCouponBtn) removeCouponBtn.style.display = 'none';
+                    if (couponCodeInput) {
+                        couponCodeInput.value = '';
+                        couponCodeInput.disabled = false;
+                    }
+
+                    Swal.fire({
+                        text: "Coupon removed successfully",
+                        icon: "success"
+                    });
+                }
+            } catch (error) {
+                console.error('Detailed error:', error);
+                Swal.fire({
+                    text: "Failed to remove the coupon",
+                    icon: "error"
+                });
             }
-
-            Swal.fire({
-                text: "Coupon removed successfully",
-                icon: "success"
-            });
         }
-    } catch (error) {
-        console.error('Detailed error:', error); 
-        Swal.fire({
-            text: "Failed to remove the coupon",
-            icon: "error"
-        });
-    }
-}
 
 
         function resetCouponState(originalPrice) {
@@ -807,6 +816,32 @@ async function removeCoupon() {
             });
         }
 
+
+
+        async function processWalletPayment(formData) {
+            try {
+                const response = await fetch('/wallet-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to process wallet payment.');
+                }
+
+                window.location.href = `/order-confirmation?id=${result.orderId}`;
+            } catch (error) {
+                console.error('Wallet payment error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Failed to process wallet payment. Please try again.',
+                    icon: 'error'
+                });
+            }
+        }
 
 
 

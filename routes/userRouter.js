@@ -117,16 +117,17 @@ router.get('/orders', userAuth, ordersController.getOrders)
 router.get('/order-details', userAuth, ordersController.getOrderDetails)
 router.get('/cancel-order', userAuth, ordersController.getOrderCancel)
 router.post("/return-request",userAuth,ordersController.returnRequest)
+//Invoicedownload
 router.get("/download-Invoice",userAuth,ordersController.downloadInvoice)
-
+//paymentfailer
 router.post('/retry-payment',checkOutControllers.retryPayment)
 router.get('/payment-failed',userAuth,checkOutControllers.paymentFailed);
 
+router.post('/wallet-payment',ordersController.walletPayment);
 
 //coupon
 router.get('/coupons', userAuth, ordersController.getCoupons)
 router.post("/apply-coupon", userAuth, ordersController.applyCoupon)
-// Example route configuration
 router.post('/remove-coupon',userAuth,ordersController.removeCoupon);
 
 
