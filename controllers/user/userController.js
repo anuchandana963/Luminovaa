@@ -39,22 +39,15 @@ const loadHomepage = async (req, res) => {
     try {
         // const user = req.user;
         const userId = req.session.user
-        console.log("user Id", userId);
-
+       
 
         const category = await Category.find({ isListed: true })
-        console.log(category)
+
         let productData = await Product.find({
             isBlocked: false,
-            category: { $in: category.map(category => category._id) }, quantity: { $gt: 0 }
-        }).sort({ createdAt: -1 })
-      
-
-        // if (req.isAuthenticated()) {
-        //     return res.render("home",{user:userId,productData})
-        // }
-
-        // productData.sort((a,b)=>new Date(a.createdAt)-new Date(b.createdAt)).reverse()
+            category: { $in: category.map(cat =>cat._id ) },
+             quantity: { $gt: 0 }
+        }).sort({ createdAt: -1 }).populate('category');
 
 
         if (userId) {
@@ -76,7 +69,7 @@ function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
 async function sendVerificationEmail(email, otp) {
-    console.log(email);
+   
 
     try {
         const transporter = nodemailer.createTransport({
@@ -89,6 +82,7 @@ async function sendVerificationEmail(email, otp) {
                 pass: process.env.NODEMAILER_PASSWORD,
             }
         })
+        console.log(process.env.NODEMAILER_EMAIL,process.env.NODEMAILER_PASSWORD)
         console.log("verification:", email, otp);
 
         const info = await transporter.sendMail({
@@ -110,7 +104,7 @@ const signup = async (req, res) => {
 
     try {
         const { name, phone, email, password, cpassword } = req.body;
-        console.log("Request Body:", req.body);
+        
 
         if (password !== cpassword) {
             return res.render("singup", { message: "Password not matching" })
@@ -121,8 +115,6 @@ const signup = async (req, res) => {
         }
         const otp = generateOtp();
 
-        console.log("Sending OTP to:", email, otp);
-
         const emailSend = await sendVerificationEmail(email, otp)
         if (!emailSend) {
             return res.json('email-error')
@@ -132,7 +124,6 @@ const signup = async (req, res) => {
         req.session.userData = { name, phone, email, password }
 
         res.render("verify-otp")
-        console.log("OTP Send", otp);
 
 
     } catch (error) {
@@ -154,8 +145,7 @@ const securePassword = async (password) => {
 const verifyOtp = async (req, res) => {
     try {
 
-        const { otp } = req.body
-        console.log("entered otp:", otp);
+        const { otp } = req.body;
         console.log("session otp:", req.session.userOtp);
         if (otp === req.session.userOtp) {
             const user = req.session.userData
@@ -316,23 +306,25 @@ const loadShoppingPage = async (req, res) => {
         const categorise = await Category.find({ isListed: true })
         const categoryId = categorise.map((category) => category._id.toString())
         const page = parseInt(req.query.page) || 1
-        const limit = 8;
+        const limit = 9;
         const skip = (page - 1) * limit
         const product = await Product.find({
             isBlocked: false,
             category: { $in: categoryId },
             quantity: { $gt: 0 },
-        }).sort(sortOption).skip(skip).limit(limit);
+        }).sort(sortOption).skip(skip).limit(limit).populate('category','name');
 
         const totalProducts = await Product.countDocuments({
             isBlocked: false,
             category: { $in: categoryId },
             quantity: { $gt: 0 }
-        })
+        }).populate('category','name')
         const totalPages = Math.ceil(totalProducts / limit)
 
 
         const categoriseWithIds = categorise.map(category => ({ _id: category._id, name: category.name }))
+        console.log(product);
+        
 
 
         return res.render("shop", {
@@ -362,7 +354,7 @@ const filterProduct = async (req, res) => {
             query.category = findCategory._id;
         }
 
-        let findProducts = await Product.find(query).lean();
+        let findProducts = await Product.find(query).populate('category','name').lean();
         findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createOn));
 
         const categorise = await Category.find({ isListed: true })
@@ -416,7 +408,7 @@ const filterByPrice = async (req, res) => {
             salePrice: { $gt: req.query.gt, $lt: req.query.lt },
             isBlocked: false,
             quantity: { $gt: 0 },
-        }).lean()
+        }).populate('category','name').lean()
 
         findProducts.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn))
 
@@ -468,7 +460,7 @@ const searchProducts = async (req, res) => {
                 isBlocked: false,
                 quantity: { $gt: 0 },
                 category: { $in: categoryIds }
-            })
+            }).populate('category','name')
         }
         // console.log("searchResult",searchResult)
         searchResult.sort((a,b) => new Date(b.createOn) - new Date(a.createOn))
@@ -489,12 +481,40 @@ const searchProducts = async (req, res) => {
         })
 
     } catch (error) {
-        console.log("Error", error);
+        console.log("Error sercherror", error);
         res.redirect("/pageNotFound")
     }
 }
 
 
+const getAbout=async(req,res)=> {
+    try {
+        
+    const team = [
+        {
+            name: "Anuchandana",
+            position: "Founder & CEO",
+            bio: "Watch enthusiast with 15 years of experience",
+            image: "/images/team/anu.jpg"
+        },
+       
+    ];
+    
+    res.render('about', { team });
+   } catch (error) {
+     res.redirect("/pageNotFound")   
+   }
+};
+
+const contact=async(req,res)=>{
+    try {
+        const user=req.session.user
+        const userData=await User.findById(user)
+        res.render("contact",{user:userData})
+    } catch (error) {
+        res.redirect("/pageNotFound")
+    }
+}
 
 
 
@@ -513,5 +533,6 @@ module.exports = {
     filterProduct,
     filterByPrice,
     searchProducts,
-
+    getAbout,
+    contact,
 }

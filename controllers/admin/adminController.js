@@ -133,7 +133,7 @@ async function getTotalSales() {
             data: Array(totalWeeks).fill(0)
         };
         weeklySales.forEach(item => {
-            const weekIndex = item._id - 1; // Convert to zero-based index
+            const weekIndex = item._id - 1;
             if (weekIndex >= 0 && weekIndex < totalWeeks) {
                 weeklyData.data[weekIndex] = item.sales;
             }
@@ -143,7 +143,7 @@ async function getTotalSales() {
             data: Array(12).fill(0)
         };
         monthlySales.forEach(item => {
-            const monthIndex = item._id - 1; // Convert to zero-based index
+            const monthIndex = item._id - 1;
             monthlyData.data[monthIndex] = item.sales;
         });
         const currentYear = new Date().getFullYear();

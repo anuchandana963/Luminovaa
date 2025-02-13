@@ -1,11 +1,109 @@
  <%-include("../../views/partials/user/header")%>
 
+ <style>
+    .features-ads {
+        padding: 50px 0;
+        background: #f8f9fa;
+    }
+    
+    .single-features-ads {
+        text-align: center;
+        padding: 30px 20px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        top: 0;
+    }
+    
+    .single-features-ads:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .single-features-ads img {
+        width: 65px;
+        height: 65px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .single-features-ads:hover img {
+        transform: scale(1.1);
+    }
+    
+    .single-features-ads h4 {
+        color: #253D4E;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .single-features-ads:hover h4 {
+        color: #3BB77E;
+    }
+    
+    .single-features-ads p {
+        color: #7E7E7E;
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    /* Additional effects for each card */
+    .single-features-ads.first:hover {
+        background: linear-gradient(to bottom right, #ffffff, #f0f7ff);
+    }
+    
+    .single-features-ads.second:hover {
+        background: linear-gradient(to bottom right, #ffffff, #fff5f5);
+    }
+    
+    .single-features-ads:hover p {
+        color: #505050;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 991px) {
+        .single-features-ads {
+            margin-bottom: 30px;
+        }
+    }
+   
 
+    
+.home-slider {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+}
+
+.single-hero-slider {
+    width: 100%;
+    height: 100vh;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+    width: 100%;
+    height: 100vh;
+}
+
+.container-fluid {
+    max-width: 100%;
+}
+
+
+    </style>
     <div class="mobile-header-active mobile-header-wrapper-style">
         <div class="mobile-header-wrapper-inner">
             <div class="mobile-header-top">
                 <div class="mobile-header-logo">
-                    <a href="/"><img src="/evara-frontendassets/imgs/theme/logo.svg" alt="logo"></a>
+                    <a href="/"><img src="" alt="LUMINOVA"></a>
                 </div>
                 <div class="mobile-menu-close close-style-wrap close-style-position-inherit">
                     <button class="close-style search-close">
@@ -62,63 +160,36 @@
         </div>
     </div>
     <main class="main">       
-        <section class="home-slider position-relative pt-50">
+        <section class="home-slider position-relative">
             <div class="hero-slider-1 dot-style-1 dot-style-1-position-1">
-                <div class="single-hero-slider single-animation-wrap">
-                    <div class="container">
-                        <div class="row align-items-center slider-animated-1">
-                            <div class="col-lg-5 col-md-6">
-                                <div class="hero-slider-content-2">
-                                    <h4 class="animated">Trade-in offer</h4>
-                                    <h2 class="animated fw-900">Supper value deals</h2>
-                                    <h1 class="animated fw-900 text-brand">On all products</h1>
-                                    <p class="animated">Save more with coupons & up to 70% off</p>
-                                    <a class="animated btn btn-brush btn-brush-3" href="/shop"> Shop Now </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-7 col-md-6">
+                <div class="single-hero-slider single-animation-wrap" style="height: 100vh;">
+                    <div class="container-fluid p-0">
+                        <div class="row align-items-center slider-animated-1 m-0">
+                            <div class="col-12 p-0">
                                 <div class="single-slider-img single-slider-img-1">
-                                    <img class="animated slider-1-1" src="/evara-frontendassets/imgs/slider/slider-1.png" alt="">
+                                    <img class="animated slider-1-1 w-100 h-100 object-fit-cover" style="height: 100vh;" src="/evara-frontend/assets/imgs/slider/banner1.jpg" alt="">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="single-hero-slider single-animation-wrap">
-                    <div class="container">
-                        <div class="row align-items-center slider-animated-1">
-                            <div class="col-lg-5 col-md-6">
-                                <div class="hero-slider-content-2">
-                                    <h4 class="animated">Hot promotions</h4>
-                                    <h2 class="animated fw-900">Fashion Watches</h2>
-                                    <h1 class="animated fw-900 text-7">Great Collection</h1>
-                                    <p class="animated">Save more with coupons & up to 20% off</p>
-                                    <a class="animated btn btn-brush btn-brush-2" href="/shop"> Discover Now </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-7 col-md-6">
+                <div class="single-hero-slider single-animation-wrap" style="height: 100vh;">
+                    <div class="container-fluid p-0">
+                        <div class="row align-items-center slider-animated-1 m-0">
+                            <div class="col-12 p-0">
                                 <div class="single-slider-img single-slider-img-1">
-                                    <img class="animated slider-1-2" src="/evara-frontendassets/imgs/slider/slider-2.png" alt="">
+                                    <img class="animated slider-1-2 w-100 h-100 object-fit-cover" style="height: 100vh;" src="/evara-frontend/assets/imgs/slider/banner 2.jpg" alt="">
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="single-hero-slider single-animation-wrap">
-                    <div class="container">
-                        <div class="row align-items-center slider-animated-1">
-                            <div class="col-lg-5 col-md-6">
-                                <div class="hero-slider-content-2">
-                                    <h4 class="animated">Upcoming Offer</h4>
-                                    <h2 class="animated fw-900">Big Deals From</h2>
-                                    <h1 class="animated fw-900 text-8">Manufacturer</h1>
-                                    <p class="animated">Watches & Wallets...</p>
-                                    <a class="animated btn btn-brush btn-brush-1" href="/shop"> Shop Now </a>
-                                </div>
-                            </div>
-                            <div class="col-lg-7 col-md-6">
+                <div class="single-hero-slider single-animation-wrap" style="height: 100vh;">
+                    <div class="container-fluid p-0">
+                        <div class="row align-items-center slider-animated-1 m-0">
+                            <div class="col-12 p-0">
                                 <div class="single-slider-img single-slider-img-1">
-                                    <img class="animated slider-1-3" src="/evara-frontendassets/imgs/slider/slider-3.png" alt="">
+                                    <img class="animated slider-1-3 w-100 h-100 object-fit-cover" style="height: 100vh;" src="/evara-frontend/assets/imgs/slider/banner3.jpg" alt="">
                                 </div>
                             </div>
                         </div>
@@ -127,13 +198,77 @@
             </div>
             <div class="slider-arrow hero-slider-1-arrow"></div>
         </section>
+
         <section class="featured section-padding position-relative">            
             <div class="container">
                
             </div>
+        </section><br><br><br> 
+        <section class="features-section spad">
+            <div class="features-ads">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="single-features-ads first">
+                                <img src="/evara-frontend/assets/imgs/slider/freeDel.png" alt=""><br>
+                                <h4>Free shipping</h4>
+                                <p>"Our online e-commerce website offers a seamless shopping experience with free shipping on all orders! We prioritize customer 
+                                    satisfaction by ensuring fast, hassle-free deliveries at no extra cost. Shop with confidence and enjoy a smooth,
+                                    cost-effective shopping journey!" </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="single-features-ads second">
+                                <img src="/evara-frontend/assets/imgs/slider/coin.png" alt=""><br>
+                                <h4>100% Money back </h4>
+                                <p>"Our online e-commerce website ensures a 100% money-back guarantee for a risk-free shopping experience!
+                                    If you're not satisfied with your purchase, we offer a full refund with a hassle-free process.
+                                    Shop with confidence, knowing your satisfaction is our top priority!" </p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="single-features-ads">
+                                <img src="/evara-frontend/assets/imgs/slider/chat.png" alt=""><br>
+                                <h4>Online support 24/7</h4>
+                                <p>"Our online e-commerce website offers 24/7 customer support to assist you anytime! Whether you have questions or need help with 
+                                    your order, our team is always available to provide quick and reliable assistance. Shop with confidence, knowing we're here for you!"</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Features Box -->
+            <div class="features-box">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="single-box-item first-box">
+                                        <img src="/img/brown-gold-black-full-rim-geometric-vincent-chase-polarized-pilot-collection-vc-s15403-c2-sunglasses_g_0715_01_02_2023.webp" alt="">
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="single-box-item second-box">
+                                        <img src="/img/Silver-Maroon-Full-Rim-Geometric-Vincent-Chase-LIVEWIRE-VC-S14506-C5-Polarized-Sunglasses_G_7229.webp" alt="">
+                                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="single-box-item large-box">
+                                <img src="/img/images (2).jpg" alt="">
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
         <section class="product-tabs section-padding position-relative wow fadeIn animated">
-            <div class="bg-square"></div>
+        
             <div class="container">
                 <div class="tab-header">
                 
@@ -189,6 +324,26 @@
                 </div>
             </div>
         </section>
+
+        <div class="logo-section spad">
+            <div class="logo-items owl-carousel">
+                <div class="logo-item">
+                    <img src="img/logos/logo-1.png" alt="">
+                </div>
+                <div class="logo-item">
+                    <img src="img/logos/logo-2.png" alt="">
+                </div>
+                <div class="logo-item">
+                    <img src="img/logos/logo-3.png" alt="">
+                </div>
+                <div class="logo-item">
+                    <img src="img/logos/logo-4.png" alt="">
+                </div>
+                <div class="logo-item">
+                    <img src="img/logos/logo-5.png" alt="">
+                </div>
+            </div>
+        </div>
     
     </main>
     

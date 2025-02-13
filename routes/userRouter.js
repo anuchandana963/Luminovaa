@@ -57,6 +57,11 @@ router.get('/login', userController.loadLogin);
 router.post("/login", userController.login);
 router.get('/logout', userAuth, userController.logout)
 
+//about
+router.get("/about",userAuth,userController.getAbout)
+//contact
+router.get("/contact",userAuth,userController.contact)
+
 
 //product
 router.get("/productDetails", userAuth, productController.productDetails)
@@ -69,7 +74,7 @@ router.get("/edit-profile", userAuth, profileController.getEditProfile)
 router.post("/edit-profile", userAuth, profileController.EditProfile)
 
 //address
-router.get("getAddress",userAuth,profileController.getAddress)
+router.get("/getAddress",userAuth,profileController.getAddress)
 router.get("/addAddress", userAuth, profileController.addAddress)
 
 

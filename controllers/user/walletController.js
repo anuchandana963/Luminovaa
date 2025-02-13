@@ -9,12 +9,12 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// First, modify the loadWallet function
+
 const loadWallet = async (req, res) => {
     try {
         const user=req.session.user;
         const userData=await User.findById(user)
-        // Get user ID from either regular session or passport session
+       
         const userId = req.session.user || (req.session.passport && req.session.passport.user);
         
         if (!userId) {
@@ -63,10 +63,9 @@ const loadWallet = async (req, res) => {
     }
 };
 
-// Update the createWallet function
 const createWallet = async (req, res) => {
     try {
-        // Get user ID from either regular session or passport session
+       
         const userId = req.session.user || (req.session.passport && req.session.passport.user);
         
         if (!userId) {
@@ -96,12 +95,12 @@ const createWallet = async (req, res) => {
     }
 };
 
-// Update the verifyWallet function
+
 const verifyWallet = async (req, res) => {
     try {
         const { paymentId, orderId, signature } = req.body;
         
-        // Get user ID from either regular session or passport session
+      
         const userId = req.session.user || (req.session.passport && req.session.passport.user);
         
         if (!userId) {

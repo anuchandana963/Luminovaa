@@ -108,65 +108,43 @@ const getReturnPage = async (req, res) => {
 }
 
 
-const returnRequest = async (req, res) => {
+const returnRequest= async (req,res)=>{
     try {
-        const status = req.body.status;
-        const returnId = req.query.id;
-
-        console.log('Return ID:', returnId);
+        const status=req.body.status;
+        const returnId=req.query.id;
 
         const returnData = await Return.findById(returnId);
-        if (!returnData) {
-            return res.json({ message: 'return id not found' });
+        if(!returnData){
+            return res.json({message:'retun id not fount'})
+
         }
+        const orderId=returnData.orderId;
+        const userId=returnData.userId;
+        const amount=returnData.refundAmount;
+        console.log(orderId);
 
-        console.log('Return Data:', returnData);
+        if(status=='approved'){
+            const wallet=await Wallet.findOneAndUpdate({userId},{$inc:{balance:amount},$push:{transactions:{type:'Refund',amount,orderId,description:'Refund for your returned product'}}})
+            returnData.returnStatus ='approved';
+            await returnData.save();
+            await Order.findByIdAndUpdate(orderId,{$set:{status:'Returned'}})
 
-        const orderId = returnData.orderId;
-        const userId = returnData.userId;
-        const amount = returnData.refundAmount;
+        }else if(status=='rejected'){
+            returnData.returnStatus =status;
+            await returnData.save();
+            await Order.findByIdAndUpdate(orderId,{$set:{status:'Return Requeest'}})
 
-        if (status === 'approved') {
-            try {
-                const walletUpdate = await Wallet.findOneAndUpdate(
-                    { userId },
-                    {
-                        $inc: { balance: amount },
-                        $push: {
-                            transactions: {
-                                type: 'Refund',
-                                amount,
-                                orderId,
-                                description: 'Refund for your returned product'
-                            }
-                        }
-                    },
-                    { new: true }
-                );
-
-                // if (!walletUpdate) {
-                //     console.log('Wallet not found for user:', userId);
-                //     return res.status(404).json({message: 'Wallet not found'});
-                // } 
-
-                returnData.returnStatus = 'approved';
-                await returnData.save();
-                await Order.findByIdAndUpdate(orderId, { $set: { status: 'Returned' } });
-
-            } catch (walletError) {
-                console.error('Wallet update error:', walletError);
-                return res.status(500).json({ message: 'Error updating wallet' });
-            }
+        }else{
+            return res.status(400).json({message:'something wend wrong'})
         }
+        res.redirect('/admin/getReturnRequest')
 
-
-        res.redirect('/admin/getReturnRequest');
 
     } catch (error) {
-        console.error('Full error:', error);
-        res.redirect('/admin/pageerror');
+        res.redirect('/admin/pageerror')
+        
     }
-};
+}
 
 
 const pdfGenerate = async (req, res) => {
