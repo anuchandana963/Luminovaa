@@ -672,8 +672,10 @@
                             });
 
                             const verifyResult = await verifyResponse.json();
-                            if (!verifyResult.success) throw new Error(verifyResult.message || 'Payment verification failed');
-
+                            
+                            if (!verifyResult.success) {
+                                throw new Error(verifyResult.message || 'Payment verification failed');
+                            }
                             const finalOrderResponse = await fetch('/place-order', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },

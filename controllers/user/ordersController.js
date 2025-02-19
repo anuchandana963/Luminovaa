@@ -72,10 +72,7 @@ const getOrderCancel= async (req,res)=>{
         }
         if (order.paymentMethod === 'Online' && order.paymentStatus === 'Completed') {
             const refundAmount = order.finalAmount;
-            console.log(refundAmount);
             
-
-     
             const wallet = await Wallet.findOneAndUpdate(
                 { userId },
                 {
@@ -103,7 +100,7 @@ const getOrderCancel= async (req,res)=>{
             const product=await Product.findById(order.orderedItems[i].product)
             product.quantity+=order.orderedItems[i].quantity
             await product.save()
-        }
+        } 
         
 
 
@@ -446,6 +443,7 @@ const walletPayment = async (req, res) => {
         } else if (cart) {
             const cartItems = JSON.parse(cart);
             orderedItems = cartItems.map(item => ({
+                productName: item.productName,
                 product: item.productId,
                 quantity: item.quantity,
                 price: item.totalPrice / item.quantity,

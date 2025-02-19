@@ -8,6 +8,10 @@ const cartSchema=new Schema({
         required:true
     },
     items:[{
+        productName: {
+            type: String,
+            required: true
+        },
         productId:{
             type:Schema.Types.ObjectId,
             ref:'Product',

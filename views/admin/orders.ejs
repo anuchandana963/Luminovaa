@@ -270,7 +270,7 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>#ID</th>
+                                    <th>ID</th>
                                     <th scope="col">Date</th>
                                     <th scope="col">Product</th>
                                     <th scope="col">Quantity</th>
@@ -288,7 +288,9 @@
                                         <td>
                                             <ul style="padding-left: 15px; margin: 0;">
                                                 <% orders[i].orderedItems.forEach(item => { %>
-                                                    <li><%= item.product.productName %></li>
+                                                    <li>
+                                                        <%= item.product ? item.product.productName : 'Product Deleted' %>
+                                                    </li>
                                                 <% }) %>
                                             </ul>
                                         </td>

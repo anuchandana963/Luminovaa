@@ -271,6 +271,7 @@ const PostCheckOut = async (req, res) => {
         const orderedItems = [];
         for (const item of cart.items) {
             const product = await Product.findById(item.productId);
+            console.log(product)
 
             if (!product || product.isBlocked) {
                 console.error(`Product is blocked or not found: ${item.productId}`);
@@ -278,6 +279,7 @@ const PostCheckOut = async (req, res) => {
             }
 
             orderedItems.push({
+                productName: item.productName,
                 product: item.productId,
                 quantity: item.quantity,
                 price: item.totalPrice / item.quantity,
@@ -343,7 +345,7 @@ const placeOrderInitial = async (req, res) => {
     try {
         const { cart, totalPrice, addressId, singleProduct, payment_method, finalPrice, discount } = req.body;
         const userId = req.session.user;
-        console.log(req.body);
+   
 
         let orderedItems = [];
         if (singleProduct) {
@@ -361,10 +363,12 @@ const placeOrderInitial = async (req, res) => {
         } else if (cart) {
             const cartItems = JSON.parse(cart);
             orderedItems = cartItems.map(item => ({
+                productName: item.productName,
                 product: item.productId,
                 quantity: item.quantity,
                 price: item.totalPrice / item.quantity,
             }));
+            
             cartItems.forEach(async item => {
                 await Product.findByIdAndUpdate(item.productId, {
                     $inc: { quantity: -item.quantity }
@@ -423,7 +427,7 @@ const orderConfirm = async (req, res) => {
     const placeOrder= async (req, res) => {
         try {
             const { orderId, paymentDetails, paymentSuccess } = req.body;
-    
+            console.log('reqbody',req.body)
             const order = await Order.findById(orderId);
             if (!order) {
                 return res.status(404).json({ success: false, message: 'Order not found' });

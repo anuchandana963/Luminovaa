@@ -432,7 +432,7 @@ const getOrderDetail = async (req, res) => {
                 return await Product.findOne({ _id: item.product })
             })
         );
-        res.render('orderDetails', { order, products, address: address.address[0], user })
+        res.render('orderDetails', { order, products, address:address.address[0], user })
 
 
     } catch (error) {

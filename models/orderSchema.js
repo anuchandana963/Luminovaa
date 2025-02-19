@@ -11,11 +11,14 @@ const orderSchema=new Schema({
     },
     user:{
         type:Schema.Types.ObjectId,
-        ref:'User',
+        ref:'User', 
         required:true
     },
 
     orderedItems:[{
+        productName: {
+            type: String,
+        },
         product:{
             type:Schema.Types.ObjectId,
             ref:'Product',

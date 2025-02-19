@@ -63,6 +63,7 @@
                                 <tr class="main-heading">
                                     <th scope="col">Date</th>
                                     <th scope="col">Transaction Type</th>
+                                    <th scope="col">product</th>
                                     <th scope="col">Amount</th>
                                     <th scope="col">Status</th>
                                 </tr>
@@ -70,14 +71,22 @@
                             <tbody>
                                 <% for (let i = transactions.length - 1; i >= 0; i--) { %>
                                     <tr>
+
                                         <td data-title="Date"><%=transactions[i].date.toLocaleDateString()%></td>
+                                        
                                         <td data-title="Transaction Type"><%=transactions[i].type%></td>
                                         <% if (transactions[i].type === "Purchase") { %>
+                                            <td>
+                                                <strong><%= transactions[i].orderId?.orderedItems[0].productName %></strong>
+                                            </td>
                                             <td data-title="Amount">
                                                 <b class="text-danger" style="font-size: 25px;">-</b>&nbsp;
                                                 <strong class="text-danger">₹<%=transactions[i].amount.toLocaleString()%></strong>
                                             </td>
                                         <% } else { %>
+                                            <td>
+
+                                            </td>
                                             <td data-title="Amount">
                                                 <b class="text-success" style="font-size: 20px;">+</b>&nbsp;
                                                 <strong class="text-success">₹<%=transactions[i].amount.toLocaleString()%></strong>

@@ -68,7 +68,7 @@ const loadHomepage = async (req, res) => {
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();
 }
-async function sendVerificationEmail(email, otp) {
+async function sendVerificationEmail(email, otp) { 
    
 
     try {

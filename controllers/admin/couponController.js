@@ -50,14 +50,6 @@ const deleteCoupon=async (req,res)=>{
 
 
 
-
-
-
-
-
-
-
-
 module.exports={
     getCoupon,
     addCoupon,

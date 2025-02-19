@@ -57,6 +57,7 @@ const addToCart=async (req,res)=>{
             cart= new Cart({
                 userId:userId,
                 items:[{
+                    productName: product.productName,
                     productId:productId,
                     quantity:quantityNumber,
                     price:productPrice,
@@ -79,6 +80,7 @@ const addToCart=async (req,res)=>{
                 }
             }else{
                 cart.items.push({
+                    productName: product.productName,
                     productId:productId,
                     quantity:quantityNumber,
                     price:productPrice,
